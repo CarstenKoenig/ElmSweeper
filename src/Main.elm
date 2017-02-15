@@ -1,58 +1,46 @@
 module Main exposing (..)
 
-import Html exposing (Html, beginnerProgram, div, button, text)
+import Html exposing (Html, program, div, button, text)
 import Html.Attributes as Attr
 import Html.Events as Events
+import Random
 import Grid exposing (..)
+import Game exposing (..)
+import Platform.Sub
+import Platform.Cmd as Cmd
 
 
 main : Program Never Model Msg
 main =
-    beginnerProgram { model = initialModel, view = view, update = update }
-
-
-type alias Model =
-    { grid : Grid Cell
-    }
-
-
-type Cell
-    = Hidden Content
-    | Free Int
-    | HitMine
-
-
-type Content
-    = Empty
-    | Mine
-
-
-initialModel : Model
-initialModel =
-    { grid = initWith 15 20 (Hidden Empty) }
+    program
+        { init = ( initialModel 15 25, Random.generate InitModel (modelGenerator 15 25 40) )
+        , view = view
+        , subscriptions = \_ -> Platform.Sub.none
+        , update = update
+        }
 
 
 type Msg
-    = NoOp
+    = InitModel Model
     | Reveal Coord
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
-            model
+        InitModel model ->
+            model ! []
 
         Reveal coord ->
             case getCell coord model.grid of
                 Just (Hidden Empty) ->
-                    { model | grid = setCell coord (Free 0) model.grid }
+                    { model | grid = setCell coord (Free 0) model.grid } ! []
 
                 Just (Hidden Mine) ->
-                    { model | grid = setCell coord HitMine model.grid }
+                    { model | grid = setCell coord HitMine model.grid } ! []
 
                 _ ->
-                    model
+                    model ! []
 
 
 view : Model -> Html Msg
