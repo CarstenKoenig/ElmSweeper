@@ -7,6 +7,7 @@ import Set exposing (Set)
 
 type alias Model =
     { grid : Grid Cell
+    , gameOver : Bool
     }
 
 
@@ -30,7 +31,9 @@ initialModel rows cols mines =
         grid =
             mines |> List.foldl insertMine empty
     in
-        { grid = grid }
+        { grid = grid
+        , gameOver = False
+        }
 
 
 insertMine : Coord -> Grid Cell -> Grid Cell
@@ -78,12 +81,26 @@ neighbours coord =
 
 reveal : Coord -> Model -> Model
 reveal coord model =
-    let
-        gridUpd =
-            (coord :: emptyClosure model.grid coord)
-                |> List.foldl revealPos model.grid
-    in
-        { model | grid = gridUpd }
+    if model.gameOver then
+        model
+    else
+        let
+            gridUpd =
+                (coord :: emptyClosure model.grid coord)
+                    |> List.foldl revealPos model.grid
+
+            hitMine =
+                case getCell coord model.grid of
+                    Just (Hidden Mine) ->
+                        True
+
+                    _ ->
+                        False
+        in
+            { model
+                | grid = gridUpd
+                , gameOver = model.gameOver || hitMine
+            }
 
 
 revealPos : Coord -> Grid Cell -> Grid Cell

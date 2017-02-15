@@ -38,7 +38,17 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    viewGrid viewCell model.grid
+    let
+        gameStatus =
+            if model.gameOver then
+                Html.h3 [] [ text "you are dead - sorry" ]
+            else
+                Html.h3 [] [ text "good luck pal" ]
+    in
+        div []
+            [ gameStatus
+            , viewGrid viewCell model.grid
+            ]
 
 
 viewCell : Coord -> Cell -> Html Msg
