@@ -11,13 +11,24 @@ main =
 
 
 type alias Model =
-    { grid : Grid ()
+    { grid : Grid Cell
     }
+
+
+type Cell
+    = Hidden Content
+    | Free Int
+    | HitMine
+
+
+type Content
+    = Empty
+    | Mine
 
 
 initialModel : Model
 initialModel =
-    { grid = initWith 10 20 () }
+    { grid = initWith 15 20 (Hidden Empty) }
 
 
 type Msg
@@ -36,6 +47,18 @@ view model =
     viewGrid viewCell model.grid
 
 
-viewCell : a -> Html msg
+viewCell : Cell -> Html msg
 viewCell cell =
-    button [ Attr.style [ ( "width", "20px" ), ( "height", "20px" ) ] ] []
+    let
+        attributes =
+            [ Attr.style [ ( "width", "25px" ), ( "height", "25px" ) ] ]
+    in
+        case cell of
+            Hidden _ ->
+                button attributes []
+
+            Free nr ->
+                div attributes [ text (toString nr) ]
+
+            HitMine ->
+                div attributes [ text "X" ]

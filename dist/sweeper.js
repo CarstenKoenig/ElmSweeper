@@ -8182,44 +8182,77 @@ var _user$project$Grid$nrRows = function (grid) {
 };
 
 var _user$project$Main$viewCell = function (cell) {
-	return A2(
-		_elm_lang$html$Html$button,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$style(
+	var attributes = {
+		ctor: '::',
+		_0: _elm_lang$html$Html_Attributes$style(
+			{
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'width', _1: '25px'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'height', _1: '25px'},
+					_1: {ctor: '[]'}
+				}
+			}),
+		_1: {ctor: '[]'}
+	};
+	var _p0 = cell;
+	switch (_p0.ctor) {
+		case 'Hidden':
+			return A2(
+				_elm_lang$html$Html$button,
+				attributes,
+				{ctor: '[]'});
+		case 'Free':
+			return A2(
+				_elm_lang$html$Html$div,
+				attributes,
 				{
 					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'width', _1: '20px'},
-					_1: {
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'height', _1: '20px'},
-						_1: {ctor: '[]'}
-					}
-				}),
-			_1: {ctor: '[]'}
-		},
-		{ctor: '[]'});
+					_0: _elm_lang$html$Html$text(
+						_elm_lang$core$Basics$toString(_p0._0)),
+					_1: {ctor: '[]'}
+				});
+		default:
+			return A2(
+				_elm_lang$html$Html$div,
+				attributes,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('X'),
+					_1: {ctor: '[]'}
+				});
+	}
 };
 var _user$project$Main$view = function (model) {
 	return A2(_user$project$Grid$viewGrid, _user$project$Main$viewCell, model.grid);
 };
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p0 = msg;
+		var _p1 = msg;
 		return model;
 	});
-var _user$project$Main$initialModel = {
-	grid: A3(
-		_user$project$Grid$initWith,
-		10,
-		20,
-		{ctor: '_Tuple0'})
-};
-var _user$project$Main$main = _elm_lang$html$Html$beginnerProgram(
-	{model: _user$project$Main$initialModel, view: _user$project$Main$view, update: _user$project$Main$update})();
 var _user$project$Main$Model = function (a) {
 	return {grid: a};
 };
+var _user$project$Main$HitMine = {ctor: 'HitMine'};
+var _user$project$Main$Free = function (a) {
+	return {ctor: 'Free', _0: a};
+};
+var _user$project$Main$Hidden = function (a) {
+	return {ctor: 'Hidden', _0: a};
+};
+var _user$project$Main$Mine = {ctor: 'Mine'};
+var _user$project$Main$Empty = {ctor: 'Empty'};
+var _user$project$Main$initialModel = {
+	grid: A3(
+		_user$project$Grid$initWith,
+		15,
+		20,
+		_user$project$Main$Hidden(_user$project$Main$Empty))
+};
+var _user$project$Main$main = _elm_lang$html$Html$beginnerProgram(
+	{model: _user$project$Main$initialModel, view: _user$project$Main$view, update: _user$project$Main$update})();
 var _user$project$Main$NoOp = {ctor: 'NoOp'};
 
 var Elm = {};
