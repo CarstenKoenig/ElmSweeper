@@ -8145,13 +8145,146 @@ var _elm_lang$html$Html_Attributes$classList = function (list) {
 };
 var _elm_lang$html$Html_Attributes$style = _elm_lang$virtual_dom$VirtualDom$style;
 
-var _user$project$Grid$viewRow = F2(
-	function (viewCell, row) {
+var _elm_lang$html$Html_Events$keyCode = A2(_elm_lang$core$Json_Decode$field, 'keyCode', _elm_lang$core$Json_Decode$int);
+var _elm_lang$html$Html_Events$targetChecked = A2(
+	_elm_lang$core$Json_Decode$at,
+	{
+		ctor: '::',
+		_0: 'target',
+		_1: {
+			ctor: '::',
+			_0: 'checked',
+			_1: {ctor: '[]'}
+		}
+	},
+	_elm_lang$core$Json_Decode$bool);
+var _elm_lang$html$Html_Events$targetValue = A2(
+	_elm_lang$core$Json_Decode$at,
+	{
+		ctor: '::',
+		_0: 'target',
+		_1: {
+			ctor: '::',
+			_0: 'value',
+			_1: {ctor: '[]'}
+		}
+	},
+	_elm_lang$core$Json_Decode$string);
+var _elm_lang$html$Html_Events$defaultOptions = _elm_lang$virtual_dom$VirtualDom$defaultOptions;
+var _elm_lang$html$Html_Events$onWithOptions = _elm_lang$virtual_dom$VirtualDom$onWithOptions;
+var _elm_lang$html$Html_Events$on = _elm_lang$virtual_dom$VirtualDom$on;
+var _elm_lang$html$Html_Events$onFocus = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'focus',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onBlur = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'blur',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onSubmitOptions = _elm_lang$core$Native_Utils.update(
+	_elm_lang$html$Html_Events$defaultOptions,
+	{preventDefault: true});
+var _elm_lang$html$Html_Events$onSubmit = function (msg) {
+	return A3(
+		_elm_lang$html$Html_Events$onWithOptions,
+		'submit',
+		_elm_lang$html$Html_Events$onSubmitOptions,
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onCheck = function (tagger) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'change',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$targetChecked));
+};
+var _elm_lang$html$Html_Events$onInput = function (tagger) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'input',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$targetValue));
+};
+var _elm_lang$html$Html_Events$onMouseOut = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseout',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseOver = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseover',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseLeave = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseleave',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseEnter = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseenter',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseUp = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mouseup',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onMouseDown = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'mousedown',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onDoubleClick = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'dblclick',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$onClick = function (msg) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'click',
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _elm_lang$html$Html_Events$Options = F2(
+	function (a, b) {
+		return {stopPropagation: a, preventDefault: b};
+	});
+
+var _user$project$Grid$viewRow = F3(
+	function (viewCell, nrRow, row) {
 		return A2(
 			_elm_lang$html$Html$div,
-			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$style(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'clear', _1: 'left'},
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
 			_elm_lang$core$Array$toList(
-				A2(_elm_lang$core$Array$map, viewCell, row)));
+				A2(
+					_elm_lang$core$Array$indexedMap,
+					F2(
+						function (nrCol, cell) {
+							return A2(
+								viewCell,
+								{row: nrRow, col: nrCol},
+								cell);
+						}),
+					row)));
 	});
 var _user$project$Grid$viewGrid = F2(
 	function (viewCell, grid) {
@@ -8160,9 +8293,28 @@ var _user$project$Grid$viewGrid = F2(
 			{ctor: '[]'},
 			_elm_lang$core$Array$toList(
 				A2(
-					_elm_lang$core$Array$map,
+					_elm_lang$core$Array$indexedMap,
 					_user$project$Grid$viewRow(viewCell),
 					grid)));
+	});
+var _user$project$Grid$setCell = F3(
+	function (coord, value, grid) {
+		var _p0 = A2(_elm_lang$core$Array$get, coord.row, grid);
+		if (_p0.ctor === 'Nothing') {
+			return grid;
+		} else {
+			var newRow = A3(_elm_lang$core$Array$set, coord.col, value, _p0._0);
+			return A3(_elm_lang$core$Array$set, coord.row, newRow, grid);
+		}
+	});
+var _user$project$Grid$getCell = F2(
+	function (coord, grid) {
+		return A2(
+			_elm_lang$core$Maybe$andThen,
+			function (row) {
+				return A2(_elm_lang$core$Array$get, coord.col, row);
+			},
+			A2(_elm_lang$core$Array$get, coord.row, grid));
 	});
 var _user$project$Grid$initWith = F3(
 	function (rows, cols, content) {
@@ -8170,68 +8322,21 @@ var _user$project$Grid$initWith = F3(
 		return A2(_elm_lang$core$Array$repeat, rows, row);
 	});
 var _user$project$Grid$nrCols = function (grid) {
-	var _p0 = A2(_elm_lang$core$Array$get, 0, grid);
-	if (_p0.ctor === 'Nothing') {
+	var _p1 = A2(_elm_lang$core$Array$get, 0, grid);
+	if (_p1.ctor === 'Nothing') {
 		return 0;
 	} else {
-		return _elm_lang$core$Array$length(_p0._0);
+		return _elm_lang$core$Array$length(_p1._0);
 	}
 };
 var _user$project$Grid$nrRows = function (grid) {
 	return _elm_lang$core$Array$length(grid);
 };
-
-var _user$project$Main$viewCell = function (cell) {
-	var attributes = {
-		ctor: '::',
-		_0: _elm_lang$html$Html_Attributes$style(
-			{
-				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: 'width', _1: '25px'},
-				_1: {
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'height', _1: '25px'},
-					_1: {ctor: '[]'}
-				}
-			}),
-		_1: {ctor: '[]'}
-	};
-	var _p0 = cell;
-	switch (_p0.ctor) {
-		case 'Hidden':
-			return A2(
-				_elm_lang$html$Html$button,
-				attributes,
-				{ctor: '[]'});
-		case 'Free':
-			return A2(
-				_elm_lang$html$Html$div,
-				attributes,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text(
-						_elm_lang$core$Basics$toString(_p0._0)),
-					_1: {ctor: '[]'}
-				});
-		default:
-			return A2(
-				_elm_lang$html$Html$div,
-				attributes,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('X'),
-					_1: {ctor: '[]'}
-				});
-	}
-};
-var _user$project$Main$view = function (model) {
-	return A2(_user$project$Grid$viewGrid, _user$project$Main$viewCell, model.grid);
-};
-var _user$project$Main$update = F2(
-	function (msg, model) {
-		var _p1 = msg;
-		return model;
+var _user$project$Grid$Coord = F2(
+	function (a, b) {
+		return {row: a, col: b};
 	});
+
 var _user$project$Main$Model = function (a) {
 	return {grid: a};
 };
@@ -8239,6 +8344,37 @@ var _user$project$Main$HitMine = {ctor: 'HitMine'};
 var _user$project$Main$Free = function (a) {
 	return {ctor: 'Free', _0: a};
 };
+var _user$project$Main$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		if (_p0.ctor === 'NoOp') {
+			return model;
+		} else {
+			var _p2 = _p0._0;
+			var _p1 = A2(_user$project$Grid$getCell, _p2, model.grid);
+			if ((_p1.ctor === 'Just') && (_p1._0.ctor === 'Hidden')) {
+				if (_p1._0._0.ctor === 'Empty') {
+					return _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							grid: A3(
+								_user$project$Grid$setCell,
+								_p2,
+								_user$project$Main$Free(0),
+								model.grid)
+						});
+				} else {
+					return _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							grid: A3(_user$project$Grid$setCell, _p2, _user$project$Main$HitMine, model.grid)
+						});
+				}
+			} else {
+				return model;
+			}
+		}
+	});
 var _user$project$Main$Hidden = function (a) {
 	return {ctor: 'Hidden', _0: a};
 };
@@ -8250,6 +8386,77 @@ var _user$project$Main$initialModel = {
 		15,
 		20,
 		_user$project$Main$Hidden(_user$project$Main$Empty))
+};
+var _user$project$Main$Reveal = function (a) {
+	return {ctor: 'Reveal', _0: a};
+};
+var _user$project$Main$viewCell = F2(
+	function (coord, cell) {
+		var attributes = {
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$style(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'float', _1: 'left'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'width', _1: '25px'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'height', _1: '25px'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'text-align', _1: 'center'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'vertical-align', _1: 'middle'},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'line-height', _1: '25px'},
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				}),
+			_1: {ctor: '[]'}
+		};
+		var _p3 = cell;
+		switch (_p3.ctor) {
+			case 'Hidden':
+				return A2(
+					_elm_lang$html$Html$button,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(
+							_user$project$Main$Reveal(coord)),
+						_1: attributes
+					},
+					{ctor: '[]'});
+			case 'Free':
+				return A2(
+					_elm_lang$html$Html$div,
+					attributes,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(
+							_elm_lang$core$Basics$toString(_p3._0)),
+						_1: {ctor: '[]'}
+					});
+			default:
+				return A2(
+					_elm_lang$html$Html$div,
+					attributes,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('X'),
+						_1: {ctor: '[]'}
+					});
+		}
+	});
+var _user$project$Main$view = function (model) {
+	return A2(_user$project$Grid$viewGrid, _user$project$Main$viewCell, model.grid);
 };
 var _user$project$Main$main = _elm_lang$html$Html$beginnerProgram(
 	{model: _user$project$Main$initialModel, view: _user$project$Main$view, update: _user$project$Main$update})();
