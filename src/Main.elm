@@ -33,15 +33,7 @@ update msg model =
             model ! []
 
         Reveal coord ->
-            case getCell coord model.grid of
-                Just (Hidden (Empty n)) ->
-                    { model | grid = setCell coord (Free n) model.grid } ! []
-
-                Just (Hidden Mine) ->
-                    { model | grid = setCell coord HitMine model.grid } ! []
-
-                _ ->
-                    model ! []
+            reveal coord model ! []
 
 
 view : Model -> Html Msg

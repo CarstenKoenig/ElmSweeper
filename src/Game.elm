@@ -1,7 +1,8 @@
-module Game exposing (Model, Cell(..), Content(..), initialModel)
+module Game exposing (Model, Cell(..), Content(..), initialModel, reveal)
 
 import Grid exposing (..)
 import List.Extra exposing (lift2)
+import Set exposing (Set)
 
 
 type alias Model =
@@ -73,3 +74,84 @@ neighbours coord =
             )
             dim1neigh
             dim1neigh
+
+
+reveal : Coord -> Model -> Model
+reveal coord model =
+    let
+        gridUpd =
+            (coord :: emptyClosure model.grid coord)
+                |> List.foldl revealPos model.grid
+    in
+        { model | grid = gridUpd }
+
+
+revealPos : Coord -> Grid Cell -> Grid Cell
+revealPos coord grid =
+    case getCell coord grid of
+        Just (Hidden (Empty n)) ->
+            setCell coord (Free n) grid
+
+        Just (Hidden Mine) ->
+            setCell coord HitMine grid
+
+        _ ->
+            grid
+
+
+emptyClosure : Grid Cell -> Coord -> List Coord
+emptyClosure grid coord =
+    close grid Set.empty (List.singleton coord) []
+
+
+close : Grid Cell -> Set ( Int, Int ) -> List Coord -> List Coord -> List Coord
+close grid seen queue accu =
+    case queue of
+        [] ->
+            accu
+
+        coord :: rest ->
+            case getCell coord grid of
+                Just (Hidden (Empty 0)) ->
+                    if Set.member (toTuple coord) seen then
+                        close grid seen rest accu
+                    else
+                        let
+                            seenUpd =
+                                Set.insert (toTuple coord) seen
+
+                            queueUpd =
+                                left coord :: right coord :: up coord :: down coord :: queue
+
+                            accuUpd =
+                                accu ++ neighbours coord
+                        in
+                            close grid seenUpd queueUpd accuUpd
+
+                _ ->
+                    close grid seen rest accu
+
+
+toTuple : Coord -> ( Int, Int )
+toTuple coord =
+    ( coord.row, coord.col )
+
+
+left : Coord -> Coord
+left coord =
+    { coord | col = coord.col - 1 }
+
+
+right : Coord -> Coord
+right coord =
+    { coord | col = coord.col + 1 }
+
+
+up : Coord -> Coord
+up coord =
+    { coord | row = coord.row - 1 }
+
+
+down : Coord -> Coord
+down coord =
+    { coord | row = coord.row + 1 }
