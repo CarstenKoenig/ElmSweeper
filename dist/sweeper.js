@@ -9500,6 +9500,21 @@ var _user$project$Grid$Coord = F2(
 		return {row: a, col: b};
 	});
 
+var _user$project$Game$neighbours = function (coord) {
+	return A2(
+		_elm_lang$core$List$concatMap,
+		function (r) {
+			return A2(
+				_elm_lang$core$List$map,
+				function (c) {
+					return _elm_lang$core$Native_Utils.update(
+						coord,
+						{col: coord.col + c, row: coord.row + r});
+				},
+				A2(_elm_lang$core$List$range, -1, 1));
+		},
+		A2(_elm_lang$core$List$range, -1, 1));
+};
 var _user$project$Game$Model = function (a) {
 	return {grid: a};
 };
@@ -9511,16 +9526,71 @@ var _user$project$Game$Hidden = function (a) {
 	return {ctor: 'Hidden', _0: a};
 };
 var _user$project$Game$Mine = {ctor: 'Mine'};
-var _user$project$Game$Empty = {ctor: 'Empty'};
-var _user$project$Game$initialModel = F2(
-	function (rows, cols) {
-		return {
-			grid: A3(
-				_user$project$Grid$initWith,
-				rows,
-				cols,
-				_user$project$Game$Hidden(_user$project$Game$Empty))
-		};
+var _user$project$Game$Empty = function (a) {
+	return {ctor: 'Empty', _0: a};
+};
+var _user$project$Game$increaseEmpty = F2(
+	function (coord, grid) {
+		var _p0 = A2(_user$project$Grid$getCell, coord, grid);
+		_v0_2:
+		do {
+			if (_p0.ctor === 'Just') {
+				switch (_p0._0.ctor) {
+					case 'Hidden':
+						if (_p0._0._0.ctor === 'Empty') {
+							return A3(
+								_user$project$Grid$setCell,
+								coord,
+								_user$project$Game$Hidden(
+									_user$project$Game$Empty(_p0._0._0._0 + 1)),
+								grid);
+						} else {
+							break _v0_2;
+						}
+					case 'Free':
+						return A3(
+							_user$project$Grid$setCell,
+							coord,
+							_user$project$Game$Free(_p0._0._0 + 1),
+							grid);
+					default:
+						break _v0_2;
+				}
+			} else {
+				break _v0_2;
+			}
+		} while(false);
+		return grid;
+	});
+var _user$project$Game$increaseNeighbours = F2(
+	function (coord, grid) {
+		return A3(
+			_elm_lang$core$List$foldl,
+			_user$project$Game$increaseEmpty,
+			grid,
+			_user$project$Game$neighbours(coord));
+	});
+var _user$project$Game$insertMine = F2(
+	function (coord, grid) {
+		return A2(
+			_user$project$Game$increaseNeighbours,
+			coord,
+			A3(
+				_user$project$Grid$setCell,
+				coord,
+				_user$project$Game$Hidden(_user$project$Game$Mine),
+				grid));
+	});
+var _user$project$Game$initialModel = F3(
+	function (rows, cols, mines) {
+		var empty = A3(
+			_user$project$Grid$initWith,
+			rows,
+			cols,
+			_user$project$Game$Hidden(
+				_user$project$Game$Empty(0)));
+		var grid = A3(_elm_lang$core$List$foldl, _user$project$Game$insertMine, empty, mines);
+		return {grid: grid};
 	});
 
 var _user$project$RandomGame$pickN = F2(
@@ -9571,34 +9641,14 @@ var _user$project$RandomGame$randomCoords = F3(
 			n,
 			A2(_user$project$RandomGame$coords, rows, cols));
 	});
-var _user$project$RandomGame$gridGenerator = F3(
-	function (rows, cols, n) {
-		var empty = A3(
-			_user$project$Grid$initWith,
-			rows,
-			cols,
-			_user$project$Game$Hidden(_user$project$Game$Empty));
-		return A2(
-			_elm_lang$core$Random$map,
-			A2(
-				_elm_lang$core$List$foldl,
-				function (coord) {
-					return A2(
-						_user$project$Grid$setCell,
-						coord,
-						_user$project$Game$Hidden(_user$project$Game$Mine));
-				},
-				empty),
-			A3(_user$project$RandomGame$randomCoords, rows, cols, n));
-	});
 var _user$project$RandomGame$modelGenerator = F3(
 	function (rows, cols, n) {
 		return A2(
 			_elm_lang$core$Random$map,
-			function (grid) {
-				return {grid: grid};
+			function (mines) {
+				return A3(_user$project$Game$initialModel, rows, cols, mines);
 			},
-			A3(_user$project$RandomGame$gridGenerator, rows, cols, n));
+			A3(_user$project$RandomGame$randomCoords, rows, cols, n));
 	});
 
 var _user$project$Main$update = F2(
@@ -9622,7 +9672,7 @@ var _user$project$Main$update = F2(
 								grid: A3(
 									_user$project$Grid$setCell,
 									_p2,
-									_user$project$Game$Free(0),
+									_user$project$Game$Free(_p1._0._0._0),
 									model.grid)
 							}),
 						{ctor: '[]'});
@@ -9729,7 +9779,11 @@ var _user$project$Main$main = _elm_lang$html$Html$program(
 	{
 		init: {
 			ctor: '_Tuple2',
-			_0: A2(_user$project$Game$initialModel, 15, 25),
+			_0: A3(
+				_user$project$Game$initialModel,
+				15,
+				25,
+				{ctor: '[]'}),
 			_1: A2(
 				_elm_lang$core$Random$generate,
 				_user$project$Main$InitModel,

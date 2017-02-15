@@ -14,7 +14,7 @@ import Platform.Cmd as Cmd
 main : Program Never Model Msg
 main =
     program
-        { init = ( initialModel 15 25, Random.generate InitModel (modelGenerator 15 25 40) )
+        { init = ( initialModel 15 25 [], Random.generate InitModel (modelGenerator 15 25 40) )
         , view = view
         , subscriptions = \_ -> Platform.Sub.none
         , update = update
@@ -34,8 +34,8 @@ update msg model =
 
         Reveal coord ->
             case getCell coord model.grid of
-                Just (Hidden Empty) ->
-                    { model | grid = setCell coord (Free 0) model.grid } ! []
+                Just (Hidden (Empty n)) ->
+                    { model | grid = setCell coord (Free n) model.grid } ! []
 
                 Just (Hidden Mine) ->
                     { model | grid = setCell coord HitMine model.grid } ! []

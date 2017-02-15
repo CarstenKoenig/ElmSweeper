@@ -9,18 +9,8 @@ import Random.List exposing (choose)
 
 modelGenerator : Int -> Int -> Int -> Generator Model
 modelGenerator rows cols n =
-    gridGenerator rows cols n
-        |> Rnd.map (\grid -> { grid = grid })
-
-
-gridGenerator : Int -> Int -> Int -> Generator (Grid Cell)
-gridGenerator rows cols n =
-    let
-        empty =
-            initWith rows cols (Hidden Empty)
-    in
-        randomCoords rows cols n
-            |> Rnd.map (List.foldl (\coord -> setCell coord (Hidden Mine)) empty)
+    randomCoords rows cols n
+        |> Rnd.map (\mines -> initialModel rows cols mines)
 
 
 randomCoords : Int -> Int -> Int -> Generator (List Coord)
