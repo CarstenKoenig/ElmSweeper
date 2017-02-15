@@ -1,6 +1,7 @@
 module Game exposing (Model, Cell(..), Content(..), initialModel)
 
 import Grid exposing (..)
+import List.Extra exposing (lift2)
 
 
 type alias Model =
@@ -59,15 +60,16 @@ increaseEmpty coord grid =
 
 neighbours : Coord -> List Coord
 neighbours coord =
-    List.range -1 1
-        |> List.concatMap
-            (\r ->
-                List.range -1 1
-                    |> List.map
-                        (\c ->
-                            { coord
-                                | col = coord.col + c
-                                , row = coord.row + r
-                            }
-                        )
+    let
+        dim1neigh =
+            List.range -1 1
+    in
+        lift2
+            (\r c ->
+                { coord
+                    | col = coord.col + c
+                    , row = coord.row + r
+                }
             )
+            dim1neigh
+            dim1neigh
