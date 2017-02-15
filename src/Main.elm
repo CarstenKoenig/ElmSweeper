@@ -6,6 +6,7 @@ import Html.Events as Events
 import Random
 import Grid exposing (..)
 import Game exposing (..)
+import RandomGame exposing (modelGenerator)
 import Platform.Sub
 import Platform.Cmd as Cmd
 

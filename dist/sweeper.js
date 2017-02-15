@@ -9500,54 +9500,6 @@ var _user$project$Grid$Coord = F2(
 		return {row: a, col: b};
 	});
 
-var _user$project$Game$pickN = F2(
-	function (n, xs) {
-		var _p0 = n;
-		if (_p0 === 0) {
-			return _elm_community$random_extra$Random_Extra$constant(
-				{ctor: '[]'});
-		} else {
-			return A2(
-				_elm_lang$core$Random$andThen,
-				function (_p1) {
-					var _p2 = _p1;
-					var _p3 = _p2._0;
-					if (_p3.ctor === 'Nothing') {
-						return _elm_community$random_extra$Random_Extra$constant(
-							{ctor: '[]'});
-					} else {
-						return A2(
-							_elm_lang$core$Random$map,
-							function (xs3) {
-								return {ctor: '::', _0: _p3._0, _1: xs3};
-							},
-							A2(_user$project$Game$pickN, _p0 - 1, _p2._1));
-					}
-				},
-				_elm_community$random_extra$Random_List$choose(xs));
-		}
-	});
-var _user$project$Game$coords = F2(
-	function (rows, cols) {
-		return A2(
-			_elm_lang$core$List$concatMap,
-			function (row) {
-				return A2(
-					_elm_lang$core$List$map,
-					function (col) {
-						return {row: row, col: col};
-					},
-					A2(_elm_lang$core$List$range, 0, cols - 1));
-			},
-			A2(_elm_lang$core$List$range, 0, rows - 1));
-	});
-var _user$project$Game$randomCoords = F3(
-	function (rows, cols, n) {
-		return A2(
-			_user$project$Game$pickN,
-			n,
-			A2(_user$project$Game$coords, rows, cols));
-	});
 var _user$project$Game$Model = function (a) {
 	return {grid: a};
 };
@@ -9570,7 +9522,56 @@ var _user$project$Game$initialModel = F2(
 				_user$project$Game$Hidden(_user$project$Game$Empty))
 		};
 	});
-var _user$project$Game$gridGenerator = F3(
+
+var _user$project$RandomGame$pickN = F2(
+	function (n, xs) {
+		var _p0 = n;
+		if (_p0 === 0) {
+			return _elm_community$random_extra$Random_Extra$constant(
+				{ctor: '[]'});
+		} else {
+			return A2(
+				_elm_lang$core$Random$andThen,
+				function (_p1) {
+					var _p2 = _p1;
+					var _p3 = _p2._0;
+					if (_p3.ctor === 'Nothing') {
+						return _elm_community$random_extra$Random_Extra$constant(
+							{ctor: '[]'});
+					} else {
+						return A2(
+							_elm_lang$core$Random$map,
+							function (xs3) {
+								return {ctor: '::', _0: _p3._0, _1: xs3};
+							},
+							A2(_user$project$RandomGame$pickN, _p0 - 1, _p2._1));
+					}
+				},
+				_elm_community$random_extra$Random_List$choose(xs));
+		}
+	});
+var _user$project$RandomGame$coords = F2(
+	function (rows, cols) {
+		return A2(
+			_elm_lang$core$List$concatMap,
+			function (row) {
+				return A2(
+					_elm_lang$core$List$map,
+					function (col) {
+						return {row: row, col: col};
+					},
+					A2(_elm_lang$core$List$range, 0, cols - 1));
+			},
+			A2(_elm_lang$core$List$range, 0, rows - 1));
+	});
+var _user$project$RandomGame$randomCoords = F3(
+	function (rows, cols, n) {
+		return A2(
+			_user$project$RandomGame$pickN,
+			n,
+			A2(_user$project$RandomGame$coords, rows, cols));
+	});
+var _user$project$RandomGame$gridGenerator = F3(
 	function (rows, cols, n) {
 		var empty = A3(
 			_user$project$Grid$initWith,
@@ -9588,16 +9589,16 @@ var _user$project$Game$gridGenerator = F3(
 						_user$project$Game$Hidden(_user$project$Game$Mine));
 				},
 				empty),
-			A3(_user$project$Game$randomCoords, rows, cols, n));
+			A3(_user$project$RandomGame$randomCoords, rows, cols, n));
 	});
-var _user$project$Game$modelGenerator = F3(
+var _user$project$RandomGame$modelGenerator = F3(
 	function (rows, cols, n) {
 		return A2(
 			_elm_lang$core$Random$map,
 			function (grid) {
 				return {grid: grid};
 			},
-			A3(_user$project$Game$gridGenerator, rows, cols, n));
+			A3(_user$project$RandomGame$gridGenerator, rows, cols, n));
 	});
 
 var _user$project$Main$update = F2(
@@ -9732,7 +9733,7 @@ var _user$project$Main$main = _elm_lang$html$Html$program(
 			_1: A2(
 				_elm_lang$core$Random$generate,
 				_user$project$Main$InitModel,
-				A3(_user$project$Game$modelGenerator, 15, 25, 40))
+				A3(_user$project$RandomGame$modelGenerator, 15, 25, 40))
 		},
 		view: _user$project$Main$view,
 		subscriptions: function (_p4) {
