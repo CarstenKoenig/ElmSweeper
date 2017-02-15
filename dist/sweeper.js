@@ -8435,15 +8435,22 @@ var _user$project$Main$viewCell = F2(
 					},
 					{ctor: '[]'});
 			case 'Free':
-				return A2(
-					_elm_lang$html$Html$div,
-					attributes,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(
-							_elm_lang$core$Basics$toString(_p3._0)),
-						_1: {ctor: '[]'}
-					});
+				if (_p3._0 === 0) {
+					return A2(
+						_elm_lang$html$Html$div,
+						attributes,
+						{ctor: '[]'});
+				} else {
+					return A2(
+						_elm_lang$html$Html$div,
+						attributes,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(
+								_elm_lang$core$Basics$toString(_p3._0)),
+							_1: {ctor: '[]'}
+						});
+				}
 			default:
 				return A2(
 					_elm_lang$html$Html$div,

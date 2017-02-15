@@ -78,6 +78,9 @@ viewCell coord cell =
             Hidden _ ->
                 button (Events.onClick (Reveal coord) :: attributes) []
 
+            Free 0 ->
+                div attributes []
+
             Free nr ->
                 div attributes [ text (toString nr) ]
 
