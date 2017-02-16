@@ -10950,9 +10950,9 @@ var _user$project$Game$emptyClosure = F2(
 			_elm_lang$core$List$singleton(coord),
 			{ctor: '[]'});
 	});
-var _user$project$Game$Model = F2(
-	function (a, b) {
-		return {grid: a, gameOver: b};
+var _user$project$Game$Model = F5(
+	function (a, b, c, d, e) {
+		return {grid: a, gameOver: b, gameWon: c, nrMines: d, nrHidden: e};
 	});
 var _user$project$Game$HitMine = {ctor: 'HitMine'};
 var _user$project$Game$Free = function (a) {
@@ -10988,18 +10988,22 @@ var _user$project$Game$reveal = F2(
 					return false;
 				}
 			}();
-			var gridUpd = A3(
-				_elm_lang$core$List$foldl,
-				_user$project$Game$revealPos,
-				model.grid,
-				{
-					ctor: '::',
-					_0: coord,
-					_1: A2(_user$project$Game$emptyClosure, model.grid, coord)
-				});
+			var gameOverUpd = model.gameOver || hitMine;
+			var showLocations = {
+				ctor: '::',
+				_0: coord,
+				_1: A2(_user$project$Game$emptyClosure, model.grid, coord)
+			};
+			var gridUpd = A3(_elm_lang$core$List$foldl, _user$project$Game$revealPos, model.grid, showLocations);
+			var nrHiddenUpd = model.nrHidden - _elm_lang$core$List$length(showLocations);
 			return _elm_lang$core$Native_Utils.update(
 				model,
-				{grid: gridUpd, gameOver: model.gameOver || hitMine});
+				{
+					grid: gridUpd,
+					gameOver: gameOverUpd,
+					nrHidden: nrHiddenUpd,
+					gameWon: (!gameOverUpd) && (_elm_lang$core$Native_Utils.cmp(nrHiddenUpd, model.nrMines) < 1)
+				});
 		}
 	});
 var _user$project$Game$Hidden = function (a) {
@@ -11070,7 +11074,13 @@ var _user$project$Game$initialModel = F3(
 			_user$project$Game$Hidden(
 				_user$project$Game$Empty(0)));
 		var grid = A3(_elm_lang$core$List$foldl, _user$project$Game$insertMine, empty, mines);
-		return {grid: grid, gameOver: false};
+		return {
+			grid: grid,
+			gameOver: false,
+			gameWon: false,
+			nrMines: _elm_lang$core$List$length(mines),
+			nrHidden: rows * cols
+		};
 	});
 
 var _user$project$RandomGame$pickN = F2(
@@ -11222,7 +11232,14 @@ var _user$project$Main$viewCell = F2(
 		}
 	});
 var _user$project$Main$view = function (model) {
-	var gameStatus = model.gameOver ? A2(
+	var gameStatus = model.gameWon ? A2(
+		_elm_lang$html$Html$h3,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('YOU won'),
+			_1: {ctor: '[]'}
+		}) : (model.gameOver ? A2(
 		_elm_lang$html$Html$h3,
 		{ctor: '[]'},
 		{
@@ -11236,7 +11253,7 @@ var _user$project$Main$view = function (model) {
 			ctor: '::',
 			_0: _elm_lang$html$Html$text('good luck pal'),
 			_1: {ctor: '[]'}
-		});
+		}));
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},

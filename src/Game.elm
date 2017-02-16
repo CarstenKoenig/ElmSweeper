@@ -8,6 +8,9 @@ import Set exposing (Set)
 type alias Model =
     { grid : Grid Cell
     , gameOver : Bool
+    , gameWon : Bool
+    , nrMines : Int
+    , nrHidden : Int
     }
 
 
@@ -33,6 +36,9 @@ initialModel rows cols mines =
     in
         { grid = grid
         , gameOver = False
+        , gameWon = False
+        , nrMines = List.length mines
+        , nrHidden = rows * cols
         }
 
 
@@ -85,8 +91,11 @@ reveal coord model =
         model
     else
         let
+            showLocations =
+                coord :: emptyClosure model.grid coord
+
             gridUpd =
-                (coord :: emptyClosure model.grid coord)
+                showLocations
                     |> List.foldl revealPos model.grid
 
             hitMine =
@@ -96,10 +105,18 @@ reveal coord model =
 
                     _ ->
                         False
+
+            gameOverUpd =
+                model.gameOver || hitMine
+
+            nrHiddenUpd =
+                model.nrHidden - List.length showLocations
         in
             { model
                 | grid = gridUpd
-                , gameOver = model.gameOver || hitMine
+                , gameOver = gameOverUpd
+                , nrHidden = nrHiddenUpd
+                , gameWon = not gameOverUpd && nrHiddenUpd <= model.nrMines
             }
 
 

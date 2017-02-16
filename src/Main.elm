@@ -40,7 +40,9 @@ view : Model -> Html Msg
 view model =
     let
         gameStatus =
-            if model.gameOver then
+            if model.gameWon then
+                Html.h3 [] [ text "YOU won" ]
+            else if model.gameOver then
                 Html.h3 [] [ text "you are dead - sorry" ]
             else
                 Html.h3 [] [ text "good luck pal" ]
