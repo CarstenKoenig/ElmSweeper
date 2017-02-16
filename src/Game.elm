@@ -1,4 +1,4 @@
-module Game exposing (Model, Cell(..), Content(..), initialModel, reveal)
+module Game exposing (Model, Cell(..), Content(..), initialModel, reveal, cycle)
 
 import Grid exposing (..)
 import List.Extra exposing (lift2)
@@ -16,6 +16,8 @@ type alias Model =
 
 type Cell
     = Hidden Content
+    | Flagged Content
+    | Marked Content
     | Free Int
     | HitMine
 
@@ -120,6 +122,25 @@ reveal coord model =
             }
 
 
+cycle : Coord -> Model -> Model
+cycle coord model =
+    if model.gameOver then
+        model
+    else
+        let
+            ( diff, gridUpd ) =
+                cyclePos coord model.grid
+
+            nrHiddenUpd =
+                model.nrHidden + diff
+        in
+            { model
+                | grid = gridUpd
+                , nrHidden = nrHiddenUpd
+                , gameWon = nrHiddenUpd <= model.nrMines
+            }
+
+
 revealPos : Coord -> Grid Cell -> Grid Cell
 revealPos coord grid =
     case getCell coord grid of
@@ -131,6 +152,22 @@ revealPos coord grid =
 
         _ ->
             grid
+
+
+cyclePos : Coord -> Grid Cell -> ( Int, Grid Cell )
+cyclePos coord grid =
+    case getCell coord grid of
+        Just (Hidden c) ->
+            ( -1, setCell coord (Flagged c) grid )
+
+        Just (Flagged c) ->
+            ( 1, setCell coord (Marked c) grid )
+
+        Just (Marked c) ->
+            ( 0, setCell coord (Hidden c) grid )
+
+        _ ->
+            ( 0, grid )
 
 
 emptyClosure : Grid Cell -> Coord -> List Coord

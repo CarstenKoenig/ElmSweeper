@@ -11006,42 +11006,112 @@ var _user$project$Game$reveal = F2(
 				});
 		}
 	});
+var _user$project$Game$Marked = function (a) {
+	return {ctor: 'Marked', _0: a};
+};
+var _user$project$Game$Flagged = function (a) {
+	return {ctor: 'Flagged', _0: a};
+};
 var _user$project$Game$Hidden = function (a) {
 	return {ctor: 'Hidden', _0: a};
 };
+var _user$project$Game$cyclePos = F2(
+	function (coord, grid) {
+		var _p6 = A2(_user$project$Grid$getCell, coord, grid);
+		_v16_3:
+		do {
+			if (_p6.ctor === 'Just') {
+				switch (_p6._0.ctor) {
+					case 'Hidden':
+						return {
+							ctor: '_Tuple2',
+							_0: -1,
+							_1: A3(
+								_user$project$Grid$setCell,
+								coord,
+								_user$project$Game$Flagged(_p6._0._0),
+								grid)
+						};
+					case 'Flagged':
+						return {
+							ctor: '_Tuple2',
+							_0: 1,
+							_1: A3(
+								_user$project$Grid$setCell,
+								coord,
+								_user$project$Game$Marked(_p6._0._0),
+								grid)
+						};
+					case 'Marked':
+						return {
+							ctor: '_Tuple2',
+							_0: 0,
+							_1: A3(
+								_user$project$Grid$setCell,
+								coord,
+								_user$project$Game$Hidden(_p6._0._0),
+								grid)
+						};
+					default:
+						break _v16_3;
+				}
+			} else {
+				break _v16_3;
+			}
+		} while(false);
+		return {ctor: '_Tuple2', _0: 0, _1: grid};
+	});
+var _user$project$Game$cycle = F2(
+	function (coord, model) {
+		if (model.gameOver) {
+			return model;
+		} else {
+			var _p7 = A2(_user$project$Game$cyclePos, coord, model.grid);
+			var diff = _p7._0;
+			var gridUpd = _p7._1;
+			var nrHiddenUpd = model.nrHidden + diff;
+			return _elm_lang$core$Native_Utils.update(
+				model,
+				{
+					grid: gridUpd,
+					nrHidden: nrHiddenUpd,
+					gameWon: _elm_lang$core$Native_Utils.cmp(nrHiddenUpd, model.nrMines) < 1
+				});
+		}
+	});
 var _user$project$Game$Mine = {ctor: 'Mine'};
 var _user$project$Game$Empty = function (a) {
 	return {ctor: 'Empty', _0: a};
 };
 var _user$project$Game$increaseEmpty = F2(
 	function (coord, grid) {
-		var _p6 = A2(_user$project$Grid$getCell, coord, grid);
-		_v16_2:
+		var _p8 = A2(_user$project$Grid$getCell, coord, grid);
+		_v17_2:
 		do {
-			if (_p6.ctor === 'Just') {
-				switch (_p6._0.ctor) {
+			if (_p8.ctor === 'Just') {
+				switch (_p8._0.ctor) {
 					case 'Hidden':
-						if (_p6._0._0.ctor === 'Empty') {
+						if (_p8._0._0.ctor === 'Empty') {
 							return A3(
 								_user$project$Grid$setCell,
 								coord,
 								_user$project$Game$Hidden(
-									_user$project$Game$Empty(_p6._0._0._0 + 1)),
+									_user$project$Game$Empty(_p8._0._0._0 + 1)),
 								grid);
 						} else {
-							break _v16_2;
+							break _v17_2;
 						}
 					case 'Free':
 						return A3(
 							_user$project$Grid$setCell,
 							coord,
-							_user$project$Game$Free(_p6._0._0 + 1),
+							_user$project$Game$Free(_p8._0._0 + 1),
 							grid);
 					default:
-						break _v16_2;
+						break _v17_2;
 				}
 			} else {
-				break _v16_2;
+				break _v17_2;
 			}
 		} while(false);
 		return grid;
@@ -11141,24 +11211,99 @@ var _user$project$RandomGame$modelGenerator = F3(
 			A3(_user$project$RandomGame$randomCoords, rows, cols, n));
 	});
 
+var _user$project$Main$onContextMenu = function (msg) {
+	var opts = _elm_lang$html$Html_Events$defaultOptions;
+	return A3(
+		_elm_lang$html$Html_Events$onWithOptions,
+		'contextmenu',
+		_elm_lang$core$Native_Utils.update(
+			opts,
+			{preventDefault: true, stopPropagation: true}),
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _user$project$Main$onRightClick = F2(
+	function (msgRight, msgElse) {
+		var button = A2(
+			_elm_lang$core$Json_Decode$map,
+			function (nr) {
+				var _p0 = nr;
+				if ((_p0.ctor === 'Just') && (_p0._0 === '2')) {
+					return true;
+				} else {
+					return false;
+				}
+			},
+			_elm_lang$core$Json_Decode$maybe(
+				A2(
+					_elm_lang$core$Json_Decode$at,
+					{
+						ctor: '::',
+						_0: 'button',
+						_1: {ctor: '[]'}
+					},
+					_elm_lang$core$Json_Decode$string)));
+		var which = A2(
+			_elm_lang$core$Json_Decode$map,
+			function (nr) {
+				var _p1 = nr;
+				if ((_p1.ctor === 'Just') && (_p1._0 === '3')) {
+					return true;
+				} else {
+					return false;
+				}
+			},
+			_elm_lang$core$Json_Decode$maybe(
+				A2(
+					_elm_lang$core$Json_Decode$at,
+					{
+						ctor: '::',
+						_0: 'which',
+						_1: {ctor: '[]'}
+					},
+					_elm_lang$core$Json_Decode$string)));
+		var rightMb = A3(
+			_elm_lang$core$Json_Decode$map2,
+			F2(
+				function (a, b) {
+					return (a || b) ? msgRight : msgElse;
+				}),
+			which,
+			button);
+		return A2(_elm_lang$html$Html_Events$on, 'click', rightMb);
+	});
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p0 = msg;
-		if (_p0.ctor === 'InitModel') {
-			return A2(
-				_elm_lang$core$Platform_Cmd_ops['!'],
-				_p0._0,
-				{ctor: '[]'});
-		} else {
-			return A2(
-				_elm_lang$core$Platform_Cmd_ops['!'],
-				A2(_user$project$Game$reveal, _p0._0, model),
-				{ctor: '[]'});
+		var _p2 = msg;
+		switch (_p2.ctor) {
+			case 'InitModel':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_p2._0,
+					{ctor: '[]'});
+			case 'NoOp':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					{ctor: '[]'});
+			case 'Reveal':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					A2(_user$project$Game$reveal, _p2._0, model),
+					{ctor: '[]'});
+			default:
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					A2(_user$project$Game$cycle, _p2._0, model),
+					{ctor: '[]'});
 		}
 	});
+var _user$project$Main$Cycle = function (a) {
+	return {ctor: 'Cycle', _0: a};
+};
 var _user$project$Main$Reveal = function (a) {
 	return {ctor: 'Reveal', _0: a};
 };
+var _user$project$Main$NoOp = {ctor: 'NoOp'};
 var _user$project$Main$viewCell = F2(
 	function (coord, cell) {
 		var attributes = {
@@ -11191,20 +11336,69 @@ var _user$project$Main$viewCell = F2(
 				}),
 			_1: {ctor: '[]'}
 		};
-		var _p1 = cell;
-		switch (_p1.ctor) {
+		var _p3 = cell;
+		switch (_p3.ctor) {
 			case 'Hidden':
 				return A2(
 					_elm_lang$html$Html$button,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onClick(
+						_0: A2(
+							_user$project$Main$onRightClick,
+							_user$project$Main$Cycle(coord),
 							_user$project$Main$Reveal(coord)),
-						_1: attributes
+						_1: {
+							ctor: '::',
+							_0: _user$project$Main$onContextMenu(
+								_user$project$Main$Cycle(coord)),
+							_1: attributes
+						}
 					},
 					{ctor: '[]'});
+			case 'Flagged':
+				return A2(
+					_elm_lang$html$Html$button,
+					{
+						ctor: '::',
+						_0: A2(
+							_user$project$Main$onRightClick,
+							_user$project$Main$Cycle(coord),
+							_user$project$Main$NoOp),
+						_1: {
+							ctor: '::',
+							_0: _user$project$Main$onContextMenu(
+								_user$project$Main$Cycle(coord)),
+							_1: attributes
+						}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('!'),
+						_1: {ctor: '[]'}
+					});
+			case 'Marked':
+				return A2(
+					_elm_lang$html$Html$button,
+					{
+						ctor: '::',
+						_0: A2(
+							_user$project$Main$onRightClick,
+							_user$project$Main$Cycle(coord),
+							_user$project$Main$NoOp),
+						_1: {
+							ctor: '::',
+							_0: _user$project$Main$onContextMenu(
+								_user$project$Main$Cycle(coord)),
+							_1: attributes
+						}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('?'),
+						_1: {ctor: '[]'}
+					});
 			case 'Free':
-				if (_p1._0 === 0) {
+				if (_p3._0 === 0) {
 					return A2(
 						_elm_lang$html$Html$div,
 						attributes,
@@ -11216,7 +11410,7 @@ var _user$project$Main$viewCell = F2(
 						{
 							ctor: '::',
 							_0: _elm_lang$html$Html$text(
-								_elm_lang$core$Basics$toString(_p1._0)),
+								_elm_lang$core$Basics$toString(_p3._0)),
 							_1: {ctor: '[]'}
 						});
 				}
@@ -11285,7 +11479,7 @@ var _user$project$Main$main = _elm_lang$html$Html$program(
 				A3(_user$project$RandomGame$modelGenerator, 15, 25, 40))
 		},
 		view: _user$project$Main$view,
-		subscriptions: function (_p2) {
+		subscriptions: function (_p4) {
 			return _elm_lang$core$Platform_Sub$none;
 		},
 		update: _user$project$Main$update

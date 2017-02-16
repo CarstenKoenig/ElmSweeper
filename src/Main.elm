@@ -1,14 +1,15 @@
 module Main exposing (..)
 
-import Html exposing (Html, program, div, button, text)
+import Html exposing (Html, Attribute, program, div, button, text)
 import Html.Attributes as Attr
-import Html.Events as Events
+import Html.Events as Events exposing (on, onWithOptions)
 import Random
 import Grid exposing (..)
 import Game exposing (..)
 import RandomGame exposing (modelGenerator)
 import Platform.Sub
 import Platform.Cmd as Cmd
+import Json.Decode as Json
 
 
 main : Program Never Model Msg
@@ -23,7 +24,9 @@ main =
 
 type Msg
     = InitModel Model
+    | NoOp
     | Reveal Coord
+    | Cycle Coord
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -32,8 +35,14 @@ update msg model =
         InitModel model ->
             model ! []
 
+        NoOp ->
+            model ! []
+
         Reveal coord ->
             reveal coord model ! []
+
+        Cycle coord ->
+            cycle coord model ! []
 
 
 view : Model -> Html Msg
@@ -69,7 +78,28 @@ viewCell coord cell =
     in
         case cell of
             Hidden _ ->
-                button (Events.onClick (Reveal coord) :: attributes) []
+                button
+                    (onRightClick (Cycle coord) (Reveal coord)
+                        :: onContextMenu (Cycle coord)
+                        :: attributes
+                    )
+                    []
+
+            Flagged _ ->
+                button
+                    (onRightClick (Cycle coord) NoOp
+                        :: onContextMenu (Cycle coord)
+                        :: attributes
+                    )
+                    [ text "!" ]
+
+            Marked _ ->
+                button
+                    (onRightClick (Cycle coord) NoOp
+                        :: onContextMenu (Cycle coord)
+                        :: attributes
+                    )
+                    [ text "?" ]
 
             Free 0 ->
                 div attributes []
@@ -79,3 +109,59 @@ viewCell coord cell =
 
             HitMine ->
                 div attributes [ text "X" ]
+
+
+onRightClick : msg -> msg -> Attribute msg
+onRightClick msgRight msgElse =
+    let
+        which =
+            Json.maybe (Json.at [ "which" ] Json.string)
+                |> Json.map
+                    (\nr ->
+                        case nr of
+                            Just "3" ->
+                                True
+
+                            _ ->
+                                False
+                    )
+
+        button =
+            Json.maybe (Json.at [ "button" ] Json.string)
+                |> Json.map
+                    (\nr ->
+                        case nr of
+                            Just "2" ->
+                                True
+
+                            _ ->
+                                False
+                    )
+
+        rightMb =
+            Json.map2
+                (\a b ->
+                    if a || b then
+                        msgRight
+                    else
+                        msgElse
+                )
+                which
+                button
+    in
+        on "click" rightMb
+
+
+onContextMenu : msg -> Attribute msg
+onContextMenu msg =
+    let
+        opts =
+            Events.defaultOptions
+    in
+        onWithOptions "contextmenu"
+            ({ opts
+                | preventDefault = True
+                , stopPropagation = True
+             }
+            )
+            (Json.succeed msg)
