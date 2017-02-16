@@ -48,13 +48,16 @@ update msg model =
 view : Model -> Html Msg
 view model =
     let
+        mineCounter =
+            toString (nrFlagged model) ++ " / " ++ toString (nrMines model)
+
         gameStatus =
-            if model.gameWon then
-                Html.h3 [] [ text "YOU won" ]
-            else if model.gameOver then
-                Html.h3 [] [ text "you are dead - sorry" ]
+            if gameWon model then
+                Html.h3 [] [ text <| mineCounter ++ " - you WON!" ]
+            else if gameOver model then
+                Html.h3 [] [ text <| mineCounter ++ " - you are DEAD, sorry!" ]
             else
-                Html.h3 [] [ text "good luck pal" ]
+                Html.h3 [] [ text <| mineCounter ++ " - good luck pal" ]
     in
         div []
             [ gameStatus

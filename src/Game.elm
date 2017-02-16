@@ -1,16 +1,13 @@
-module Game exposing (Model, Cell(..), Content(..), initialModel, reveal, cycle)
+module Game exposing (Model, Cell(..), Content(..), initialModel, reveal, cycle, nrFlagged, nrMines, gameWon, gameOver)
 
 import Grid exposing (..)
 import List.Extra exposing (lift2)
 import Set exposing (Set)
+import Array as Arr
 
 
 type alias Model =
     { grid : Grid Cell
-    , gameOver : Bool
-    , gameWon : Bool
-    , nrMines : Int
-    , nrHidden : Int
     }
 
 
@@ -27,6 +24,90 @@ type Content
     | Mine
 
 
+gameWon : Model -> Bool
+gameWon model =
+    not (gameOver model) && nrHidden model <= nrMines model
+
+
+nrMines : Model -> Int
+nrMines model =
+    let
+        isMine cell =
+            case cell of
+                Hidden Mine ->
+                    True
+
+                Flagged Mine ->
+                    True
+
+                Marked Mine ->
+                    True
+
+                HitMine ->
+                    True
+
+                _ ->
+                    False
+    in
+        model.grid
+            |> Arr.toList
+            |> List.map (Arr.filter isMine >> Arr.length)
+            |> List.sum
+
+
+gameOver : Model -> Bool
+gameOver model =
+    let
+        hitMine cell =
+            case cell of
+                HitMine ->
+                    True
+
+                _ ->
+                    False
+    in
+        model.grid
+            |> Arr.toList
+            |> List.any (Arr.toList >> List.any hitMine)
+
+
+nrHidden : Model -> Int
+nrHidden model =
+    let
+        isHidden cell =
+            case cell of
+                Free _ ->
+                    False
+
+                HitMine ->
+                    False
+
+                _ ->
+                    True
+    in
+        model.grid
+            |> Arr.toList
+            |> List.map (Arr.filter isHidden >> Arr.length)
+            |> List.sum
+
+
+nrFlagged : Model -> Int
+nrFlagged model =
+    let
+        isFlagged cell =
+            case cell of
+                Flagged _ ->
+                    True
+
+                _ ->
+                    False
+    in
+        model.grid
+            |> Arr.toList
+            |> List.map (Arr.filter isFlagged >> Arr.length)
+            |> List.sum
+
+
 initialModel : Int -> Int -> List Coord -> Model
 initialModel rows cols mines =
     let
@@ -37,10 +118,6 @@ initialModel rows cols mines =
             mines |> List.foldl insertMine empty
     in
         { grid = grid
-        , gameOver = False
-        , gameWon = False
-        , nrMines = List.length mines
-        , nrHidden = rows * cols
         }
 
 
@@ -89,7 +166,7 @@ neighbours coord =
 
 reveal : Coord -> Model -> Model
 reveal coord model =
-    if model.gameOver then
+    if gameOver model || gameWon model then
         model
     else
         let
@@ -99,46 +176,20 @@ reveal coord model =
             gridUpd =
                 showLocations
                     |> List.foldl revealPos model.grid
-
-            hitMine =
-                case getCell coord model.grid of
-                    Just (Hidden Mine) ->
-                        True
-
-                    _ ->
-                        False
-
-            gameOverUpd =
-                model.gameOver || hitMine
-
-            nrHiddenUpd =
-                model.nrHidden - List.length showLocations
         in
-            { model
-                | grid = gridUpd
-                , gameOver = gameOverUpd
-                , nrHidden = nrHiddenUpd
-                , gameWon = not gameOverUpd && nrHiddenUpd <= model.nrMines
-            }
+            { model | grid = gridUpd }
 
 
 cycle : Coord -> Model -> Model
 cycle coord model =
-    if model.gameOver then
+    if gameOver model || gameWon model then
         model
     else
         let
-            ( diff, gridUpd ) =
+            gridUpd =
                 cyclePos coord model.grid
-
-            nrHiddenUpd =
-                model.nrHidden + diff
         in
-            { model
-                | grid = gridUpd
-                , nrHidden = nrHiddenUpd
-                , gameWon = nrHiddenUpd <= model.nrMines
-            }
+            { model | grid = gridUpd }
 
 
 revealPos : Coord -> Grid Cell -> Grid Cell
@@ -154,20 +205,20 @@ revealPos coord grid =
             grid
 
 
-cyclePos : Coord -> Grid Cell -> ( Int, Grid Cell )
+cyclePos : Coord -> Grid Cell -> Grid Cell
 cyclePos coord grid =
     case getCell coord grid of
         Just (Hidden c) ->
-            ( -1, setCell coord (Flagged c) grid )
+            setCell coord (Flagged c) grid
 
         Just (Flagged c) ->
-            ( 1, setCell coord (Marked c) grid )
+            setCell coord (Marked c) grid
 
         Just (Marked c) ->
-            ( 0, setCell coord (Hidden c) grid )
+            setCell coord (Hidden c) grid
 
         _ ->
-            ( 0, grid )
+            grid
 
 
 emptyClosure : Grid Cell -> Coord -> List Coord

@@ -10950,23 +10950,126 @@ var _user$project$Game$emptyClosure = F2(
 			_elm_lang$core$List$singleton(coord),
 			{ctor: '[]'});
 	});
-var _user$project$Game$Model = F5(
-	function (a, b, c, d, e) {
-		return {grid: a, gameOver: b, gameWon: c, nrMines: d, nrHidden: e};
-	});
+var _user$project$Game$nrFlagged = function (model) {
+	var isFlagged = function (cell) {
+		var _p4 = cell;
+		if (_p4.ctor === 'Flagged') {
+			return true;
+		} else {
+			return false;
+		}
+	};
+	return _elm_lang$core$List$sum(
+		A2(
+			_elm_lang$core$List$map,
+			function (_p5) {
+				return _elm_lang$core$Array$length(
+					A2(_elm_lang$core$Array$filter, isFlagged, _p5));
+			},
+			_elm_lang$core$Array$toList(model.grid)));
+};
+var _user$project$Game$nrHidden = function (model) {
+	var isHidden = function (cell) {
+		var _p6 = cell;
+		switch (_p6.ctor) {
+			case 'Free':
+				return false;
+			case 'HitMine':
+				return false;
+			default:
+				return true;
+		}
+	};
+	return _elm_lang$core$List$sum(
+		A2(
+			_elm_lang$core$List$map,
+			function (_p7) {
+				return _elm_lang$core$Array$length(
+					A2(_elm_lang$core$Array$filter, isHidden, _p7));
+			},
+			_elm_lang$core$Array$toList(model.grid)));
+};
+var _user$project$Game$gameOver = function (model) {
+	var hitMine = function (cell) {
+		var _p8 = cell;
+		if (_p8.ctor === 'HitMine') {
+			return true;
+		} else {
+			return false;
+		}
+	};
+	return A2(
+		_elm_lang$core$List$any,
+		function (_p9) {
+			return A2(
+				_elm_lang$core$List$any,
+				hitMine,
+				_elm_lang$core$Array$toList(_p9));
+		},
+		_elm_lang$core$Array$toList(model.grid));
+};
+var _user$project$Game$nrMines = function (model) {
+	var isMine = function (cell) {
+		var _p10 = cell;
+		_v17_4:
+		do {
+			switch (_p10.ctor) {
+				case 'Hidden':
+					if (_p10._0.ctor === 'Mine') {
+						return true;
+					} else {
+						break _v17_4;
+					}
+				case 'Flagged':
+					if (_p10._0.ctor === 'Mine') {
+						return true;
+					} else {
+						break _v17_4;
+					}
+				case 'Marked':
+					if (_p10._0.ctor === 'Mine') {
+						return true;
+					} else {
+						break _v17_4;
+					}
+				case 'HitMine':
+					return true;
+				default:
+					break _v17_4;
+			}
+		} while(false);
+		return false;
+	};
+	return _elm_lang$core$List$sum(
+		A2(
+			_elm_lang$core$List$map,
+			function (_p11) {
+				return _elm_lang$core$Array$length(
+					A2(_elm_lang$core$Array$filter, isMine, _p11));
+			},
+			_elm_lang$core$Array$toList(model.grid)));
+};
+var _user$project$Game$gameWon = function (model) {
+	return (!_user$project$Game$gameOver(model)) && (_elm_lang$core$Native_Utils.cmp(
+		_user$project$Game$nrHidden(model),
+		_user$project$Game$nrMines(model)) < 1);
+};
+var _user$project$Game$Model = function (a) {
+	return {grid: a};
+};
 var _user$project$Game$HitMine = {ctor: 'HitMine'};
 var _user$project$Game$Free = function (a) {
 	return {ctor: 'Free', _0: a};
 };
 var _user$project$Game$revealPos = F2(
 	function (coord, grid) {
-		var _p4 = A2(_user$project$Grid$getCell, coord, grid);
-		if ((_p4.ctor === 'Just') && (_p4._0.ctor === 'Hidden')) {
-			if (_p4._0._0.ctor === 'Empty') {
+		var _p12 = A2(_user$project$Grid$getCell, coord, grid);
+		if ((_p12.ctor === 'Just') && (_p12._0.ctor === 'Hidden')) {
+			if (_p12._0._0.ctor === 'Empty') {
 				return A3(
 					_user$project$Grid$setCell,
 					coord,
-					_user$project$Game$Free(_p4._0._0._0),
+					_user$project$Game$Free(_p12._0._0._0),
 					grid);
 			} else {
 				return A3(_user$project$Grid$setCell, coord, _user$project$Game$HitMine, grid);
@@ -10977,33 +11080,18 @@ var _user$project$Game$revealPos = F2(
 	});
 var _user$project$Game$reveal = F2(
 	function (coord, model) {
-		if (model.gameOver) {
+		if (_user$project$Game$gameOver(model) || _user$project$Game$gameWon(model)) {
 			return model;
 		} else {
-			var hitMine = function () {
-				var _p5 = A2(_user$project$Grid$getCell, coord, model.grid);
-				if (((_p5.ctor === 'Just') && (_p5._0.ctor === 'Hidden')) && (_p5._0._0.ctor === 'Mine')) {
-					return true;
-				} else {
-					return false;
-				}
-			}();
-			var gameOverUpd = model.gameOver || hitMine;
 			var showLocations = {
 				ctor: '::',
 				_0: coord,
 				_1: A2(_user$project$Game$emptyClosure, model.grid, coord)
 			};
 			var gridUpd = A3(_elm_lang$core$List$foldl, _user$project$Game$revealPos, model.grid, showLocations);
-			var nrHiddenUpd = model.nrHidden - _elm_lang$core$List$length(showLocations);
 			return _elm_lang$core$Native_Utils.update(
 				model,
-				{
-					grid: gridUpd,
-					gameOver: gameOverUpd,
-					nrHidden: nrHiddenUpd,
-					gameWon: (!gameOverUpd) && (_elm_lang$core$Native_Utils.cmp(nrHiddenUpd, model.nrMines) < 1)
-				});
+				{grid: gridUpd});
 		}
 	});
 var _user$project$Game$Marked = function (a) {
@@ -11017,66 +11105,47 @@ var _user$project$Game$Hidden = function (a) {
 };
 var _user$project$Game$cyclePos = F2(
 	function (coord, grid) {
-		var _p6 = A2(_user$project$Grid$getCell, coord, grid);
-		_v16_3:
+		var _p13 = A2(_user$project$Grid$getCell, coord, grid);
+		_v19_3:
 		do {
-			if (_p6.ctor === 'Just') {
-				switch (_p6._0.ctor) {
+			if (_p13.ctor === 'Just') {
+				switch (_p13._0.ctor) {
 					case 'Hidden':
-						return {
-							ctor: '_Tuple2',
-							_0: -1,
-							_1: A3(
-								_user$project$Grid$setCell,
-								coord,
-								_user$project$Game$Flagged(_p6._0._0),
-								grid)
-						};
+						return A3(
+							_user$project$Grid$setCell,
+							coord,
+							_user$project$Game$Flagged(_p13._0._0),
+							grid);
 					case 'Flagged':
-						return {
-							ctor: '_Tuple2',
-							_0: 1,
-							_1: A3(
-								_user$project$Grid$setCell,
-								coord,
-								_user$project$Game$Marked(_p6._0._0),
-								grid)
-						};
+						return A3(
+							_user$project$Grid$setCell,
+							coord,
+							_user$project$Game$Marked(_p13._0._0),
+							grid);
 					case 'Marked':
-						return {
-							ctor: '_Tuple2',
-							_0: 0,
-							_1: A3(
-								_user$project$Grid$setCell,
-								coord,
-								_user$project$Game$Hidden(_p6._0._0),
-								grid)
-						};
+						return A3(
+							_user$project$Grid$setCell,
+							coord,
+							_user$project$Game$Hidden(_p13._0._0),
+							grid);
 					default:
-						break _v16_3;
+						break _v19_3;
 				}
 			} else {
-				break _v16_3;
+				break _v19_3;
 			}
 		} while(false);
-		return {ctor: '_Tuple2', _0: 0, _1: grid};
+		return grid;
 	});
 var _user$project$Game$cycle = F2(
 	function (coord, model) {
-		if (model.gameOver) {
+		if (_user$project$Game$gameOver(model) || _user$project$Game$gameWon(model)) {
 			return model;
 		} else {
-			var _p7 = A2(_user$project$Game$cyclePos, coord, model.grid);
-			var diff = _p7._0;
-			var gridUpd = _p7._1;
-			var nrHiddenUpd = model.nrHidden + diff;
+			var gridUpd = A2(_user$project$Game$cyclePos, coord, model.grid);
 			return _elm_lang$core$Native_Utils.update(
 				model,
-				{
-					grid: gridUpd,
-					nrHidden: nrHiddenUpd,
-					gameWon: _elm_lang$core$Native_Utils.cmp(nrHiddenUpd, model.nrMines) < 1
-				});
+				{grid: gridUpd});
 		}
 	});
 var _user$project$Game$Mine = {ctor: 'Mine'};
@@ -11085,33 +11154,33 @@ var _user$project$Game$Empty = function (a) {
 };
 var _user$project$Game$increaseEmpty = F2(
 	function (coord, grid) {
-		var _p8 = A2(_user$project$Grid$getCell, coord, grid);
-		_v17_2:
+		var _p14 = A2(_user$project$Grid$getCell, coord, grid);
+		_v20_2:
 		do {
-			if (_p8.ctor === 'Just') {
-				switch (_p8._0.ctor) {
+			if (_p14.ctor === 'Just') {
+				switch (_p14._0.ctor) {
 					case 'Hidden':
-						if (_p8._0._0.ctor === 'Empty') {
+						if (_p14._0._0.ctor === 'Empty') {
 							return A3(
 								_user$project$Grid$setCell,
 								coord,
 								_user$project$Game$Hidden(
-									_user$project$Game$Empty(_p8._0._0._0 + 1)),
+									_user$project$Game$Empty(_p14._0._0._0 + 1)),
 								grid);
 						} else {
-							break _v17_2;
+							break _v20_2;
 						}
 					case 'Free':
 						return A3(
 							_user$project$Grid$setCell,
 							coord,
-							_user$project$Game$Free(_p8._0._0 + 1),
+							_user$project$Game$Free(_p14._0._0 + 1),
 							grid);
 					default:
-						break _v17_2;
+						break _v20_2;
 				}
 			} else {
-				break _v17_2;
+				break _v20_2;
 			}
 		} while(false);
 		return grid;
@@ -11144,13 +11213,7 @@ var _user$project$Game$initialModel = F3(
 			_user$project$Game$Hidden(
 				_user$project$Game$Empty(0)));
 		var grid = A3(_elm_lang$core$List$foldl, _user$project$Game$insertMine, empty, mines);
-		return {
-			grid: grid,
-			gameOver: false,
-			gameWon: false,
-			nrMines: _elm_lang$core$List$length(mines),
-			nrHidden: rows * cols
-		};
+		return {grid: grid};
 	});
 
 var _user$project$RandomGame$pickN = F2(
@@ -11426,26 +11489,38 @@ var _user$project$Main$viewCell = F2(
 		}
 	});
 var _user$project$Main$view = function (model) {
-	var gameStatus = model.gameWon ? A2(
+	var mineCounter = A2(
+		_elm_lang$core$Basics_ops['++'],
+		_elm_lang$core$Basics$toString(
+			_user$project$Game$nrFlagged(model)),
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			' / ',
+			_elm_lang$core$Basics$toString(
+				_user$project$Game$nrMines(model))));
+	var gameStatus = _user$project$Game$gameWon(model) ? A2(
 		_elm_lang$html$Html$h3,
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text('YOU won'),
+			_0: _elm_lang$html$Html$text(
+				A2(_elm_lang$core$Basics_ops['++'], mineCounter, ' - you WON!')),
 			_1: {ctor: '[]'}
-		}) : (model.gameOver ? A2(
+		}) : (_user$project$Game$gameOver(model) ? A2(
 		_elm_lang$html$Html$h3,
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text('you are dead - sorry'),
+			_0: _elm_lang$html$Html$text(
+				A2(_elm_lang$core$Basics_ops['++'], mineCounter, ' - you are DEAD, sorry!')),
 			_1: {ctor: '[]'}
 		}) : A2(
 		_elm_lang$html$Html$h3,
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text('good luck pal'),
+			_0: _elm_lang$html$Html$text(
+				A2(_elm_lang$core$Basics_ops['++'], mineCounter, ' - good luck pal')),
 			_1: {ctor: '[]'}
 		}));
 	return A2(
