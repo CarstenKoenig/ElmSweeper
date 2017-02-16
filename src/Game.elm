@@ -148,18 +148,13 @@ increaseEmpty coord grid =
 
 
 neighbours : Coord -> List Coord
-neighbours coord =
+neighbours ( row, col ) =
     let
         dim1neigh =
             List.range -1 1
     in
         lift2
-            (\r c ->
-                { coord
-                    | col = coord.col + c
-                    , row = coord.row + r
-                }
-            )
+            (\r c -> ( row + r, col + c ))
             dim1neigh
             dim1neigh
 
@@ -223,10 +218,11 @@ cyclePos coord grid =
 
 emptyClosure : Grid Cell -> Coord -> List Coord
 emptyClosure grid coord =
-    close grid Set.empty (List.singleton coord) []
+    close grid Set.empty (List.singleton coord) Set.empty
+        |> Set.toList
 
 
-close : Grid Cell -> Set ( Int, Int ) -> List Coord -> List Coord -> List Coord
+close : Grid Cell -> Set Coord -> List Coord -> Set Coord -> Set Coord
 close grid seen queue accu =
     case queue of
         [] ->
@@ -235,18 +231,18 @@ close grid seen queue accu =
         coord :: rest ->
             case getCell coord grid of
                 Just (Hidden (Empty 0)) ->
-                    if Set.member (toTuple coord) seen then
+                    if Set.member coord seen then
                         close grid seen rest accu
                     else
                         let
                             seenUpd =
-                                Set.insert (toTuple coord) seen
+                                Set.insert coord seen
 
                             queueUpd =
                                 left coord :: right coord :: up coord :: down coord :: queue
 
                             accuUpd =
-                                accu ++ neighbours coord
+                                Set.union (Set.fromList <| neighbours coord) accu
                         in
                             close grid seenUpd queueUpd accuUpd
 
@@ -254,26 +250,21 @@ close grid seen queue accu =
                     close grid seen rest accu
 
 
-toTuple : Coord -> ( Int, Int )
-toTuple coord =
-    ( coord.row, coord.col )
-
-
 left : Coord -> Coord
-left coord =
-    { coord | col = coord.col - 1 }
+left ( row, col ) =
+    ( row, col - 1 )
 
 
 right : Coord -> Coord
-right coord =
-    { coord | col = coord.col + 1 }
+right ( row, col ) =
+    ( row, col + 1 )
 
 
 up : Coord -> Coord
-up coord =
-    { coord | row = coord.row - 1 }
+up ( row, col ) =
+    ( row - 1, col )
 
 
 down : Coord -> Coord
-down coord =
-    { coord | row = coord.row + 1 }
+down ( row, col ) =
+    ( row + 1, col )

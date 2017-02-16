@@ -24,7 +24,7 @@ coords rows cols =
         |> List.concatMap
             (\row ->
                 List.range 0 (cols - 1)
-                    |> List.map (\col -> { row = row, col = col })
+                    |> List.map (\col -> ( row, col ))
             )
 
 

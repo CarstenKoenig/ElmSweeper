@@ -10774,7 +10774,7 @@ var _user$project$Grid$viewRow = F3(
 						function (nrCol, cell) {
 							return A2(
 								viewCell,
-								{row: nrRow, col: nrCol},
+								{ctor: '_Tuple2', _0: nrRow, _1: nrCol},
 								cell);
 						}),
 					row)));
@@ -10791,23 +10791,26 @@ var _user$project$Grid$viewGrid = F2(
 					grid)));
 	});
 var _user$project$Grid$setCell = F3(
-	function (coord, value, grid) {
-		var _p0 = A2(_elm_lang$core$Array$get, coord.row, grid);
-		if (_p0.ctor === 'Nothing') {
+	function (_p0, value, grid) {
+		var _p1 = _p0;
+		var _p3 = _p1._0;
+		var _p2 = A2(_elm_lang$core$Array$get, _p3, grid);
+		if (_p2.ctor === 'Nothing') {
 			return grid;
 		} else {
-			var newRow = A3(_elm_lang$core$Array$set, coord.col, value, _p0._0);
-			return A3(_elm_lang$core$Array$set, coord.row, newRow, grid);
+			var newRow = A3(_elm_lang$core$Array$set, _p1._1, value, _p2._0);
+			return A3(_elm_lang$core$Array$set, _p3, newRow, grid);
 		}
 	});
 var _user$project$Grid$getCell = F2(
-	function (coord, grid) {
+	function (_p4, grid) {
+		var _p5 = _p4;
 		return A2(
 			_elm_lang$core$Maybe$andThen,
 			function (row) {
-				return A2(_elm_lang$core$Array$get, coord.col, row);
+				return A2(_elm_lang$core$Array$get, _p5._1, row);
 			},
-			A2(_elm_lang$core$Array$get, coord.row, grid));
+			A2(_elm_lang$core$Array$get, _p5._0, grid));
 	});
 var _user$project$Grid$initWith = F3(
 	function (rows, cols, content) {
@@ -10815,53 +10818,41 @@ var _user$project$Grid$initWith = F3(
 		return A2(_elm_lang$core$Array$repeat, rows, row);
 	});
 var _user$project$Grid$nrCols = function (grid) {
-	var _p1 = A2(_elm_lang$core$Array$get, 0, grid);
-	if (_p1.ctor === 'Nothing') {
+	var _p6 = A2(_elm_lang$core$Array$get, 0, grid);
+	if (_p6.ctor === 'Nothing') {
 		return 0;
 	} else {
-		return _elm_lang$core$Array$length(_p1._0);
+		return _elm_lang$core$Array$length(_p6._0);
 	}
 };
 var _user$project$Grid$nrRows = function (grid) {
 	return _elm_lang$core$Array$length(grid);
 };
-var _user$project$Grid$Coord = F2(
-	function (a, b) {
-		return {row: a, col: b};
-	});
 
-var _user$project$Game$down = function (coord) {
-	return _elm_lang$core$Native_Utils.update(
-		coord,
-		{row: coord.row + 1});
+var _user$project$Game$down = function (_p0) {
+	var _p1 = _p0;
+	return {ctor: '_Tuple2', _0: _p1._0 + 1, _1: _p1._1};
 };
-var _user$project$Game$up = function (coord) {
-	return _elm_lang$core$Native_Utils.update(
-		coord,
-		{row: coord.row - 1});
+var _user$project$Game$up = function (_p2) {
+	var _p3 = _p2;
+	return {ctor: '_Tuple2', _0: _p3._0 - 1, _1: _p3._1};
 };
-var _user$project$Game$right = function (coord) {
-	return _elm_lang$core$Native_Utils.update(
-		coord,
-		{col: coord.col + 1});
+var _user$project$Game$right = function (_p4) {
+	var _p5 = _p4;
+	return {ctor: '_Tuple2', _0: _p5._0, _1: _p5._1 + 1};
 };
-var _user$project$Game$left = function (coord) {
-	return _elm_lang$core$Native_Utils.update(
-		coord,
-		{col: coord.col - 1});
+var _user$project$Game$left = function (_p6) {
+	var _p7 = _p6;
+	return {ctor: '_Tuple2', _0: _p7._0, _1: _p7._1 - 1};
 };
-var _user$project$Game$toTuple = function (coord) {
-	return {ctor: '_Tuple2', _0: coord.row, _1: coord.col};
-};
-var _user$project$Game$neighbours = function (coord) {
+var _user$project$Game$neighbours = function (_p8) {
+	var _p9 = _p8;
 	var dim1neigh = A2(_elm_lang$core$List$range, -1, 1);
 	return A3(
 		_elm_community$list_extra$List_Extra$lift2,
 		F2(
 			function (r, c) {
-				return _elm_lang$core$Native_Utils.update(
-					coord,
-					{col: coord.col + c, row: coord.row + r});
+				return {ctor: '_Tuple2', _0: _p9._0 + r, _1: _p9._1 + c};
 			}),
 		dim1neigh,
 		dim1neigh);
@@ -10870,72 +10861,67 @@ var _user$project$Game$close = F4(
 	function (grid, seen, queue, accu) {
 		close:
 		while (true) {
-			var _p0 = queue;
-			if (_p0.ctor === '[]') {
+			var _p10 = queue;
+			if (_p10.ctor === '[]') {
 				return accu;
 			} else {
-				var _p3 = _p0._1;
-				var _p2 = _p0._0;
-				var _p1 = A2(_user$project$Grid$getCell, _p2, grid);
-				if ((((_p1.ctor === 'Just') && (_p1._0.ctor === 'Hidden')) && (_p1._0._0.ctor === 'Empty')) && (_p1._0._0._0 === 0)) {
-					if (A2(
-						_elm_lang$core$Set$member,
-						_user$project$Game$toTuple(_p2),
-						seen)) {
-						var _v2 = grid,
-							_v3 = seen,
-							_v4 = _p3,
-							_v5 = accu;
-						grid = _v2;
-						seen = _v3;
-						queue = _v4;
-						accu = _v5;
+				var _p13 = _p10._1;
+				var _p12 = _p10._0;
+				var _p11 = A2(_user$project$Grid$getCell, _p12, grid);
+				if ((((_p11.ctor === 'Just') && (_p11._0.ctor === 'Hidden')) && (_p11._0._0.ctor === 'Empty')) && (_p11._0._0._0 === 0)) {
+					if (A2(_elm_lang$core$Set$member, _p12, seen)) {
+						var _v7 = grid,
+							_v8 = seen,
+							_v9 = _p13,
+							_v10 = accu;
+						grid = _v7;
+						seen = _v8;
+						queue = _v9;
+						accu = _v10;
 						continue close;
 					} else {
 						var accuUpd = A2(
-							_elm_lang$core$Basics_ops['++'],
-							accu,
-							_user$project$Game$neighbours(_p2));
+							_elm_lang$core$Set$union,
+							_elm_lang$core$Set$fromList(
+								_user$project$Game$neighbours(_p12)),
+							accu);
 						var queueUpd = {
 							ctor: '::',
-							_0: _user$project$Game$left(_p2),
+							_0: _user$project$Game$left(_p12),
 							_1: {
 								ctor: '::',
-								_0: _user$project$Game$right(_p2),
+								_0: _user$project$Game$right(_p12),
 								_1: {
 									ctor: '::',
-									_0: _user$project$Game$up(_p2),
+									_0: _user$project$Game$up(_p12),
 									_1: {
 										ctor: '::',
-										_0: _user$project$Game$down(_p2),
+										_0: _user$project$Game$down(_p12),
 										_1: queue
 									}
 								}
 							}
 						};
-						var seenUpd = A2(
-							_elm_lang$core$Set$insert,
-							_user$project$Game$toTuple(_p2),
-							seen);
-						var _v6 = grid,
-							_v7 = seenUpd,
-							_v8 = queueUpd,
-							_v9 = accuUpd;
-						grid = _v6;
-						seen = _v7;
-						queue = _v8;
-						accu = _v9;
+						var seenUpd = A2(_elm_lang$core$Set$insert, _p12, seen);
+						var _v11 = grid,
+							_v12 = seenUpd,
+							_v13 = queueUpd,
+							_v14 = accuUpd;
+						grid = _v11;
+						seen = _v12;
+						queue = _v13;
+						accu = _v14;
 						continue close;
 					}
 				} else {
-					var _v10 = grid,
-						_v11 = seen,
-						_v12 = _p3,
-						_v13 = accu;
-					grid = _v10;
-					seen = _v11;
-					queue = _v12;
-					accu = _v13;
+					var _v15 = grid,
+						_v16 = seen,
+						_v17 = _p13,
+						_v18 = accu;
+					grid = _v15;
+					seen = _v16;
+					queue = _v17;
+					accu = _v18;
 					continue close;
 				}
 			}
@@ -10943,17 +10929,18 @@ var _user$project$Game$close = F4(
 	});
 var _user$project$Game$emptyClosure = F2(
 	function (grid, coord) {
-		return A4(
-			_user$project$Game$close,
-			grid,
-			_elm_lang$core$Set$empty,
-			_elm_lang$core$List$singleton(coord),
-			{ctor: '[]'});
+		return _elm_lang$core$Set$toList(
+			A4(
+				_user$project$Game$close,
+				grid,
+				_elm_lang$core$Set$empty,
+				_elm_lang$core$List$singleton(coord),
+				_elm_lang$core$Set$empty));
 	});
 var _user$project$Game$nrFlagged = function (model) {
 	var isFlagged = function (cell) {
-		var _p4 = cell;
-		if (_p4.ctor === 'Flagged') {
+		var _p14 = cell;
+		if (_p14.ctor === 'Flagged') {
 			return true;
 		} else {
 			return false;
@@ -10962,16 +10949,16 @@ var _user$project$Game$nrFlagged = function (model) {
 	return _elm_lang$core$List$sum(
 		A2(
 			_elm_lang$core$List$map,
-			function (_p5) {
+			function (_p15) {
 				return _elm_lang$core$Array$length(
-					A2(_elm_lang$core$Array$filter, isFlagged, _p5));
+					A2(_elm_lang$core$Array$filter, isFlagged, _p15));
 			},
 			_elm_lang$core$Array$toList(model.grid)));
 };
 var _user$project$Game$nrHidden = function (model) {
 	var isHidden = function (cell) {
-		var _p6 = cell;
-		switch (_p6.ctor) {
+		var _p16 = cell;
+		switch (_p16.ctor) {
 			case 'Free':
 				return false;
 			case 'HitMine':
@@ -10983,16 +10970,16 @@ var _user$project$Game$nrHidden = function (model) {
 	return _elm_lang$core$List$sum(
 		A2(
 			_elm_lang$core$List$map,
-			function (_p7) {
+			function (_p17) {
 				return _elm_lang$core$Array$length(
-					A2(_elm_lang$core$Array$filter, isHidden, _p7));
+					A2(_elm_lang$core$Array$filter, isHidden, _p17));
 			},
 			_elm_lang$core$Array$toList(model.grid)));
 };
 var _user$project$Game$gameOver = function (model) {
 	var hitMine = function (cell) {
-		var _p8 = cell;
-		if (_p8.ctor === 'HitMine') {
+		var _p18 = cell;
+		if (_p18.ctor === 'HitMine') {
 			return true;
 		} else {
 			return false;
@@ -11000,42 +10987,42 @@ var _user$project$Game$gameOver = function (model) {
 	};
 	return A2(
 		_elm_lang$core$List$any,
-		function (_p9) {
+		function (_p19) {
 			return A2(
 				_elm_lang$core$List$any,
 				hitMine,
-				_elm_lang$core$Array$toList(_p9));
+				_elm_lang$core$Array$toList(_p19));
 		},
 		_elm_lang$core$Array$toList(model.grid));
 };
 var _user$project$Game$nrMines = function (model) {
 	var isMine = function (cell) {
-		var _p10 = cell;
-		_v17_4:
+		var _p20 = cell;
+		_v22_4:
 		do {
-			switch (_p10.ctor) {
+			switch (_p20.ctor) {
 				case 'Hidden':
-					if (_p10._0.ctor === 'Mine') {
+					if (_p20._0.ctor === 'Mine') {
 						return true;
 					} else {
-						break _v17_4;
+						break _v22_4;
 					}
 				case 'Flagged':
-					if (_p10._0.ctor === 'Mine') {
+					if (_p20._0.ctor === 'Mine') {
 						return true;
 					} else {
-						break _v17_4;
+						break _v22_4;
 					}
 				case 'Marked':
-					if (_p10._0.ctor === 'Mine') {
+					if (_p20._0.ctor === 'Mine') {
 						return true;
 					} else {
-						break _v17_4;
+						break _v22_4;
 					}
 				case 'HitMine':
 					return true;
 				default:
-					break _v17_4;
+					break _v22_4;
 			}
 		} while(false);
 		return false;
@@ -11043,9 +11030,9 @@ var _user$project$Game$nrMines = function (model) {
 	return _elm_lang$core$List$sum(
 		A2(
 			_elm_lang$core$List$map,
-			function (_p11) {
+			function (_p21) {
 				return _elm_lang$core$Array$length(
-					A2(_elm_lang$core$Array$filter, isMine, _p11));
+					A2(_elm_lang$core$Array$filter, isMine, _p21));
 			},
 			_elm_lang$core$Array$toList(model.grid)));
 };
@@ -11063,13 +11050,13 @@ var _user$project$Game$Free = function (a) {
 };
 var _user$project$Game$revealPos = F2(
 	function (coord, grid) {
-		var _p12 = A2(_user$project$Grid$getCell, coord, grid);
-		if ((_p12.ctor === 'Just') && (_p12._0.ctor === 'Hidden')) {
-			if (_p12._0._0.ctor === 'Empty') {
+		var _p22 = A2(_user$project$Grid$getCell, coord, grid);
+		if ((_p22.ctor === 'Just') && (_p22._0.ctor === 'Hidden')) {
+			if (_p22._0._0.ctor === 'Empty') {
 				return A3(
 					_user$project$Grid$setCell,
 					coord,
-					_user$project$Game$Free(_p12._0._0._0),
+					_user$project$Game$Free(_p22._0._0._0),
 					grid);
 			} else {
 				return A3(_user$project$Grid$setCell, coord, _user$project$Game$HitMine, grid);
@@ -11105,34 +11092,34 @@ var _user$project$Game$Hidden = function (a) {
 };
 var _user$project$Game$cyclePos = F2(
 	function (coord, grid) {
-		var _p13 = A2(_user$project$Grid$getCell, coord, grid);
-		_v19_3:
+		var _p23 = A2(_user$project$Grid$getCell, coord, grid);
+		_v24_3:
 		do {
-			if (_p13.ctor === 'Just') {
-				switch (_p13._0.ctor) {
+			if (_p23.ctor === 'Just') {
+				switch (_p23._0.ctor) {
 					case 'Hidden':
 						return A3(
 							_user$project$Grid$setCell,
 							coord,
-							_user$project$Game$Flagged(_p13._0._0),
+							_user$project$Game$Flagged(_p23._0._0),
 							grid);
 					case 'Flagged':
 						return A3(
 							_user$project$Grid$setCell,
 							coord,
-							_user$project$Game$Marked(_p13._0._0),
+							_user$project$Game$Marked(_p23._0._0),
 							grid);
 					case 'Marked':
 						return A3(
 							_user$project$Grid$setCell,
 							coord,
-							_user$project$Game$Hidden(_p13._0._0),
+							_user$project$Game$Hidden(_p23._0._0),
 							grid);
 					default:
-						break _v19_3;
+						break _v24_3;
 				}
 			} else {
-				break _v19_3;
+				break _v24_3;
 			}
 		} while(false);
 		return grid;
@@ -11154,33 +11141,33 @@ var _user$project$Game$Empty = function (a) {
 };
 var _user$project$Game$increaseEmpty = F2(
 	function (coord, grid) {
-		var _p14 = A2(_user$project$Grid$getCell, coord, grid);
-		_v20_2:
+		var _p24 = A2(_user$project$Grid$getCell, coord, grid);
+		_v25_2:
 		do {
-			if (_p14.ctor === 'Just') {
-				switch (_p14._0.ctor) {
+			if (_p24.ctor === 'Just') {
+				switch (_p24._0.ctor) {
 					case 'Hidden':
-						if (_p14._0._0.ctor === 'Empty') {
+						if (_p24._0._0.ctor === 'Empty') {
 							return A3(
 								_user$project$Grid$setCell,
 								coord,
 								_user$project$Game$Hidden(
-									_user$project$Game$Empty(_p14._0._0._0 + 1)),
+									_user$project$Game$Empty(_p24._0._0._0 + 1)),
 								grid);
 						} else {
-							break _v20_2;
+							break _v25_2;
 						}
 					case 'Free':
 						return A3(
 							_user$project$Grid$setCell,
 							coord,
-							_user$project$Game$Free(_p14._0._0 + 1),
+							_user$project$Game$Free(_p24._0._0 + 1),
 							grid);
 					default:
-						break _v20_2;
+						break _v25_2;
 				}
 			} else {
-				break _v20_2;
+				break _v25_2;
 			}
 		} while(false);
 		return grid;
@@ -11251,7 +11238,7 @@ var _user$project$RandomGame$coords = F2(
 				return A2(
 					_elm_lang$core$List$map,
 					function (col) {
-						return {row: row, col: col};
+						return {ctor: '_Tuple2', _0: row, _1: col};
 					},
 					A2(_elm_lang$core$List$range, 0, cols - 1));
 			},

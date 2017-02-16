@@ -11,9 +11,7 @@ type alias Grid a =
 
 
 type alias Coord =
-    { row : Int
-    , col : Int
-    }
+    ( Int, Int )
 
 
 nrRows : Grid a -> Int
@@ -41,26 +39,26 @@ initWith rows cols content =
 
 
 getCell : Coord -> Grid a -> Maybe a
-getCell coord grid =
-    Arr.get coord.row grid
+getCell ( row, col ) grid =
+    Arr.get row grid
         |> Maybe.andThen
             (\row ->
-                Arr.get coord.col row
+                Arr.get col row
             )
 
 
 setCell : Coord -> a -> Grid a -> Grid a
-setCell coord value grid =
-    case Arr.get coord.row grid of
+setCell ( rowNr, colNr ) value grid =
+    case Arr.get rowNr grid of
         Nothing ->
             grid
 
         Just row ->
             let
                 newRow =
-                    Arr.set coord.col value row
+                    Arr.set colNr value row
             in
-                Arr.set coord.row newRow grid
+                Arr.set rowNr newRow grid
 
 
 viewGrid : (Coord -> a -> Html msg) -> Grid a -> Html msg
@@ -74,6 +72,6 @@ viewGrid viewCell grid =
 viewRow : (Coord -> a -> Html msg) -> Int -> Array a -> Html msg
 viewRow viewCell nrRow row =
     row
-        |> Arr.indexedMap (\nrCol cell -> viewCell { row = nrRow, col = nrCol } cell)
+        |> Arr.indexedMap (\nrCol cell -> viewCell ( nrRow, nrCol ) cell)
         |> Arr.toList
         |> div [ Attr.style [ ( "clear", "left" ) ] ]
