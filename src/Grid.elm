@@ -63,10 +63,17 @@ setCell ( rowNr, colNr ) value grid =
 
 viewGrid : (Coord -> a -> Html msg) -> Grid a -> Html msg
 viewGrid viewCell grid =
-    grid
-        |> Arr.indexedMap (viewRow viewCell)
-        |> Arr.toList
-        |> div []
+    let
+        rows =
+            grid
+                |> Arr.indexedMap (viewRow viewCell)
+                |> Arr.toList
+
+        floatClear =
+            div [ Attr.style [ ( "clear", "both" ) ] ]
+                []
+    in
+        div [] (rows ++ [ floatClear ])
 
 
 viewRow : (Coord -> a -> Html msg) -> Int -> Array a -> Html msg

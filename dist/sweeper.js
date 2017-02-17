@@ -10781,14 +10781,35 @@ var _user$project$Grid$viewRow = F3(
 	});
 var _user$project$Grid$viewGrid = F2(
 	function (viewCell, grid) {
+		var floatClear = A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$style(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'clear', _1: 'both'},
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
+			{ctor: '[]'});
+		var rows = _elm_lang$core$Array$toList(
+			A2(
+				_elm_lang$core$Array$indexedMap,
+				_user$project$Grid$viewRow(viewCell),
+				grid));
 		return A2(
 			_elm_lang$html$Html$div,
 			{ctor: '[]'},
-			_elm_lang$core$Array$toList(
-				A2(
-					_elm_lang$core$Array$indexedMap,
-					_user$project$Grid$viewRow(viewCell),
-					grid)));
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				rows,
+				{
+					ctor: '::',
+					_0: floatClear,
+					_1: {ctor: '[]'}
+				}));
 	});
 var _user$project$Grid$setCell = F3(
 	function (_p0, value, grid) {
@@ -11321,32 +11342,7 @@ var _user$project$Main$onRightClick = F2(
 			button);
 		return A2(_elm_lang$html$Html_Events$on, 'click', rightMb);
 	});
-var _user$project$Main$update = F2(
-	function (msg, model) {
-		var _p2 = msg;
-		switch (_p2.ctor) {
-			case 'InitModel':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_p2._0,
-					{ctor: '[]'});
-			case 'NoOp':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					model,
-					{ctor: '[]'});
-			case 'Reveal':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					A2(_user$project$Game$reveal, _p2._0, model),
-					{ctor: '[]'});
-			default:
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					A2(_user$project$Game$cycle, _p2._0, model),
-					{ctor: '[]'});
-		}
-	});
+var _user$project$Main$NewGame = {ctor: 'NewGame'};
 var _user$project$Main$Cycle = function (a) {
 	return {ctor: 'Cycle', _0: a};
 };
@@ -11386,8 +11382,8 @@ var _user$project$Main$viewCell = F2(
 				}),
 			_1: {ctor: '[]'}
 		};
-		var _p3 = cell;
-		switch (_p3.ctor) {
+		var _p2 = cell;
+		switch (_p2.ctor) {
 			case 'Hidden':
 				return A2(
 					_elm_lang$html$Html$button,
@@ -11448,7 +11444,7 @@ var _user$project$Main$viewCell = F2(
 						_1: {ctor: '[]'}
 					});
 			case 'Free':
-				if (_p3._0 === 0) {
+				if (_p2._0 === 0) {
 					return A2(
 						_elm_lang$html$Html$div,
 						attributes,
@@ -11460,7 +11456,7 @@ var _user$project$Main$viewCell = F2(
 						{
 							ctor: '::',
 							_0: _elm_lang$html$Html$text(
-								_elm_lang$core$Basics$toString(_p3._0)),
+								_elm_lang$core$Basics$toString(_p2._0)),
 							_1: {ctor: '[]'}
 						});
 				}
@@ -11476,6 +11472,34 @@ var _user$project$Main$viewCell = F2(
 		}
 	});
 var _user$project$Main$view = function (model) {
+	var buttons = A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$style(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '20px'},
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$button,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$NewGame),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('new'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		});
 	var mineCounter = A2(
 		_elm_lang$core$Basics_ops['++'],
 		_elm_lang$core$Basics$toString(
@@ -11519,13 +11543,56 @@ var _user$project$Main$view = function (model) {
 			_1: {
 				ctor: '::',
 				_0: A2(_user$project$Grid$viewGrid, _user$project$Main$viewCell, model.grid),
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: buttons,
+					_1: {ctor: '[]'}
+				}
 			}
 		});
 };
 var _user$project$Main$InitModel = function (a) {
 	return {ctor: 'InitModel', _0: a};
 };
+var _user$project$Main$generateNewGame = A2(
+	_elm_lang$core$Random$generate,
+	_user$project$Main$InitModel,
+	A3(_user$project$RandomGame$modelGenerator, 15, 25, 65));
+var _user$project$Main$update = F2(
+	function (msg, model) {
+		var _p3 = msg;
+		switch (_p3.ctor) {
+			case 'InitModel':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_p3._0,
+					{ctor: '[]'});
+			case 'NewGame':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					{
+						ctor: '::',
+						_0: _user$project$Main$generateNewGame,
+						_1: {ctor: '[]'}
+					});
+			case 'NoOp':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					{ctor: '[]'});
+			case 'Reveal':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					A2(_user$project$Game$reveal, _p3._0, model),
+					{ctor: '[]'});
+			default:
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					A2(_user$project$Game$cycle, _p3._0, model),
+					{ctor: '[]'});
+		}
+	});
 var _user$project$Main$main = _elm_lang$html$Html$program(
 	{
 		init: {
@@ -11535,10 +11602,7 @@ var _user$project$Main$main = _elm_lang$html$Html$program(
 				15,
 				25,
 				{ctor: '[]'}),
-			_1: A2(
-				_elm_lang$core$Random$generate,
-				_user$project$Main$InitModel,
-				A3(_user$project$RandomGame$modelGenerator, 15, 25, 40))
+			_1: _user$project$Main$generateNewGame
 		},
 		view: _user$project$Main$view,
 		subscriptions: function (_p4) {

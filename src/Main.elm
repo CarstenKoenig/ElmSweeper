@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Html exposing (Html, Attribute, program, div, button, text)
 import Html.Attributes as Attr
-import Html.Events as Events exposing (on, onWithOptions)
+import Html.Events as Events
 import Random
 import Grid exposing (..)
 import Game exposing (..)
@@ -15,7 +15,7 @@ import Json.Decode as Json
 main : Program Never Model Msg
 main =
     program
-        { init = ( initialModel 15 25 [], Random.generate InitModel (modelGenerator 15 25 40) )
+        { init = ( initialModel 15 25 [], generateNewGame )
         , view = view
         , subscriptions = \_ -> Platform.Sub.none
         , update = update
@@ -27,6 +27,12 @@ type Msg
     | NoOp
     | Reveal Coord
     | Cycle Coord
+    | NewGame
+
+
+generateNewGame : Cmd Msg
+generateNewGame =
+    Random.generate InitModel (modelGenerator 15 25 65)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -34,6 +40,9 @@ update msg model =
     case msg of
         InitModel model ->
             model ! []
+
+        NewGame ->
+            model ! [ generateNewGame ]
 
         NoOp ->
             model ! []
@@ -51,6 +60,10 @@ view model =
         mineCounter =
             toString (nrFlagged model) ++ " / " ++ toString (nrMines model)
 
+        buttons =
+            div [ Attr.style [ ( "margin-top", "20px" ) ] ]
+                [ button [ Events.onClick NewGame ] [ text "new" ] ]
+
         gameStatus =
             if gameWon model then
                 Html.h3 [] [ text <| mineCounter ++ " - you WON!" ]
@@ -62,6 +75,7 @@ view model =
         div []
             [ gameStatus
             , viewGrid viewCell model.grid
+            , buttons
             ]
 
 
@@ -152,7 +166,7 @@ onRightClick msgRight msgElse =
                 which
                 button
     in
-        on "click" rightMb
+        Events.on "click" rightMb
 
 
 onContextMenu : msg -> Attribute msg
@@ -161,7 +175,7 @@ onContextMenu msg =
         opts =
             Events.defaultOptions
     in
-        onWithOptions "contextmenu"
+        Events.onWithOptions "contextmenu"
             ({ opts
                 | preventDefault = True
                 , stopPropagation = True
